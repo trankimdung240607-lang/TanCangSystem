@@ -405,4 +405,53 @@ function performSearch() {
                     <div class="flex-1">
                         <div class="flex justify-between">
                             <h4 class="font-bold text-2xl">${type.name}</h4>
-                            <span class
+                            <span class="text-xs bg-gray-100 px-3 py-1 rounded-2xl text-[#003087]">${type.code}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-3">${type.desc}</p>
+                        <p class="text-xs mt-4"><strong>Hàng hóa điển hình:</strong><br>${type.cargos}</p>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += `</div>`;
+    }
+
+    if (foundContainers.length === 0 && foundTypes.length === 0) {
+        html += `<p class="text-gray-500 text-center py-20">Không tìm thấy kết quả phù hợp với "${term}".<br>Thử từ khóa: khô, lạnh, cao, mặt phẳng, hở mái, bồn...</p>`;
+    }
+
+    resultDiv.innerHTML = html;
+}
+
+// ==================== KHỞI TẠO CHART ====================
+function initReportChart() {
+    const ctx = document.getElementById('reportChart');
+    if (ctx) new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['01/04', '05/04', '10/04', '15/04', '19/04'],
+            datasets: [
+                { label: 'Sản lượng TEU', data: [45000, 62000, 81000, 88000, 92000], borderColor: '#003087', tension: 0.4 },
+                { label: 'Rehandle', data: [520, 410, 320, 280, 240], borderColor: '#FF8800', tension: 0.4 }
+            ]
+        },
+        options: { plugins: { legend: { position: 'top' } } }
+    });
+}
+
+// ==================== CÁC HÀM HỖ TRỢ ====================
+function addVessel() { showToast("Thêm tàu mới thành công (demo)"); }
+function editVessel(id) { showToast("Đang mở form chỉnh sửa tàu #" + id); }
+function addContainer() { showToast("Thêm container mới thành công (demo)"); }
+function editContainer(id) { showToast("Đang mở form chỉnh sửa container #" + id); }
+function clickYardCell(id) { showToast("Chi tiết ô bãi #" + id); }
+function autoOptimizeYard() { showToast("AI Optimizer đang chạy... Giảm 41% rehandle"); }
+function addAppointment() { showToast("Đặt lịch Appointment thành công"); }
+function confirmGate(id) { showToast("Gate-In đã xác nhận thành công"); }
+function editStaff(id) { showToast("Chỉnh sửa thông tin nhân viên #" + id); }
+
+// Khởi động
+window.onload = () => {};
+</script>
+</body>
+</html>

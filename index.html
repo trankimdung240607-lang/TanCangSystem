@@ -3,235 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TCSC-CMS | Hệ thống Quản lý Container Thông Minh - Tân Cảng Sài Gòn</title>
+    <title>TCSC-CMS | Tân Cảng Sài Gòn</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        .hero-bg { background: linear-gradient(135deg, #003087 0%, #00AEEF 100%); }
-        .container { max-width: 1280px; margin: 0 auto; }
-        .nav-link { transition: all 0.3s; }
-        .nav-link:hover { transform: translateY(-2px); color: #00AEEF !important; }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar { background: linear-gradient(to bottom, #003087, #002266); }
+        .nav-item:hover { background-color: rgba(0, 174, 239, 0.2); }
+        .nav-item.active { background-color: #00AEEF; color: white; }
+        .card { transition: all 0.3s; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .status-dot { animation: pulse 2s infinite; }
     </style>
 </head>
-<body class="bg-white text-gray-900">
+<body class="bg-gray-100">
 
-<!-- Navbar -->
-<nav class="bg-white shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-[#003087] rounded-2xl flex items-center justify-center text-white text-2xl">🚢</div>
+<!-- LOGIN -->
+<div id="login-page" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#003087] to-[#00AEEF]">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-10">
+        <div class="text-center mb-10">
+            <div class="mx-auto w-20 h-20 bg-[#003087] text-white rounded-3xl flex items-center justify-center text-5xl mb-6">🚢</div>
+            <h1 class="text-3xl font-bold">TCSC-CMS</h1>
+            <p class="text-gray-500">Hệ thống Quản lý Container<br>Tân Cảng Sài Gòn</p>
+        </div>
+        <input id="username" type="text" placeholder="Tài khoản" value="admin" class="w-full px-6 py-4 border border-gray-300 rounded-2xl mb-4 focus:border-[#00AEEF] focus:outline-none">
+        <input id="password" type="password" placeholder="Mật khẩu" value="123456" class="w-full px-6 py-4 border border-gray-300 rounded-2xl mb-8 focus:border-[#00AEEF] focus:outline-none">
+        <button onclick="login()" class="w-full bg-[#003087] hover:bg-[#00AEEF] text-white py-5 rounded-3xl text-lg font-semibold transition-all">Đăng nhập</button>
+        <p class="text-center text-xs text-gray-400 mt-6">Demo: admin / 123456</p>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app" class="hidden flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar w-72 text-white flex flex-col fixed h-full">
+        <div class="p-6 flex items-center gap-4 border-b border-white/20">
+            <div class="text-4xl">🚢</div>
             <div>
-                <span class="text-2xl font-bold text-[#003087]">TCSC</span>
-                <span class="text-2xl font-bold text-[#00AEEF]">CMS</span>
+                <div class="text-2xl font-bold tracking-tight">TCSC-CMS</div>
+                <div class="text-xs opacity-75">Tân Cảng Sài Gòn - Cát Lái</div>
             </div>
-            <p class="text-sm text-gray-500 ml-2">Tân Cảng Sài Gòn</p>
         </div>
-        <div class="hidden md:flex items-center gap-8 text-lg">
-            <a href="#home" class="nav-link font-medium">Trang chủ</a>
-            <a href="#problems" class="nav-link font-medium">Vấn đề & Giải pháp</a>
-            <a href="#features" class="nav-link font-medium">Tính năng</a>
-            <a href="#architecture" class="nav-link font-medium">Kiến trúc</a>
-            <a href="#demo" class="nav-link font-medium">Demo Live</a>
-            <a href="#erd" class="nav-link font-medium">ERD</a>
-        </div>
-        <button onclick="alert('Đăng nhập hệ thống (Demo)')" 
-                class="bg-[#003087] hover:bg-[#00AEEF] text-white px-8 py-3 rounded-2xl font-semibold transition-all flex items-center gap-2">
-            <i class="fas fa-sign-in-alt"></i> Đăng nhập
-        </button>
-    </div>
-</nav>
 
-<!-- Hero -->
-<section id="home" class="hero-bg text-white py-24">
-    <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-        <div>
-            <h1 class="text-6xl font-bold leading-tight mb-6">
-                Hệ thống Quản lý Container<br><span class="text-[#00AEEF]">Thông Minh</span><br>Tân Cảng Sài Gòn
-            </h1>
-            <p class="text-2xl mb-8 opacity-90">Giải quyết triệt để ùn tắc • Tối ưu bãi • Đồng bộ dữ liệu realtime</p>
-            <div class="flex gap-4">
-                <button onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})" 
-                        class="bg-white text-[#003087] px-10 py-5 rounded-3xl text-xl font-semibold hover:scale-105 transition-all">
-                    Trải nghiệm Demo Ngay
-                </button>
-                <button class="border-2 border-white px-10 py-5 rounded-3xl text-xl font-semibold hover:bg-white hover:text-[#003087] transition-all">
-                    Xem tài liệu
-                </button>
-            </div>
-            <div class="mt-12 flex items-center gap-8 text-sm">
-                <div><i class="fas fa-truck text-4xl"></i><br>Giảm 65% ùn tắc</div>
-                <div><i class="fas fa-cubes text-4xl"></i><br>Giảm 40% rehandle</div>
-                <div><i class="fas fa-clock text-4xl"></i><br>Thời gian gate < 8 phút</div>
-            </div>
-        </div>
-        <div class="relative">
-            <img src="https://picsum.photos/id/1015/800/600" alt="Cảng Tân Cảng" class="rounded-3xl shadow-2xl rotate-3">
-            <div class="absolute -bottom-6 -left-6 bg-white text-[#003087] p-6 rounded-3xl shadow-xl text-center">
-                <p class="text-5xl font-bold">18.742</p>
-                <p class="text-sm">Container đang lưu bãi (realtime)</p>
-            </div>
-        </div>
-    </div>
-</section>
+        <nav class="flex-1 p-4 space-y-1 text-lg">
+            <a onclick="showPage('dashboard')" class="nav-item active flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer"><i class="fas fa-tachometer-alt w-6"></i> Tổng quan</a>
+            <a onclick="showPage('vessel')" class="nav-item flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer"><i class="fas fa-ship w-6"></i> Quản lý tàu & Cầu bến</a>
+            <a onclick="showPage('container')" class="nav-item flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer"><i class="fas fa-cube w-6"></i> Quản lý Container</a>
+            <a onclick="showPage('yard')" class="nav-item flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer"><i class="fas fa-map w-6"></i> Bản đồ bãi container</a>
+            <a onclick="showPage('gate')" class="nav-item flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer"><i class="fas fa-truck w-6"></i> Quản lý cổng</a>
+            <a onclick="showPage('staff')" class="nav-item flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer"><i class="fas fa-users w-6"></i> Quản lý nhân sự</a>
+            <a onclick="showPage('report')" class="nav-item flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer"><i class="fas fa-chart-bar w-6"></i> Báo cáo</a>
+            <a onclick="showPage('search')" class="nav-item flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer"><i class="fas fa-search w-6"></i> Tra cứu</a>
+        </nav>
 
-<!-- Vấn đề & Giải pháp -->
-<section id="problems" class="py-20 bg-gray-50">
-    <div class="container mx-auto px-6">
-        <h2 class="text-4xl font-bold text-center mb-4">Các vấn đề đang tồn tại</h2>
-        <p class="text-center text-xl text-gray-600 mb-12">Và cách TCSC-CMS giải quyết triệt để</p>
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <!-- Problem cards -->
-            <div class="bg-white p-8 rounded-3xl shadow hover:shadow-xl transition-all">
-                <div class="text-red-500 text-4xl mb-4">🚚</div>
-                <h3 class="font-semibold text-xl mb-2">Quá tải & ùn tắc</h3>
-                <p class="text-gray-600">16.000–20.000 lượt xe/ngày</p>
-                <div class="mt-6 bg-green-100 text-green-700 text-sm px-4 py-2 rounded-2xl inline-flex items-center gap-2">
-                    <i class="fas fa-check-circle"></i> Đã giải quyết bằng AI Appointment System
-                </div>
-            </div>
-            <!-- 3 card còn lại tương tự, tôi rút gọn để code ngắn -->
-            <!-- Bạn có thể copy-paste và thay nội dung tương tự cho b, c, d -->
-        </div>
-    </div>
-</section>
-
-<!-- Tính năng chính (FR01-FR15) -->
-<section id="features" class="py-20">
-    <div class="container mx-auto px-6">
-        <h2 class="text-4xl font-bold text-center mb-12">15 Tính năng cốt lõi</h2>
-        <div class="grid md:grid-cols-3 gap-6">
-            <!-- FR01 đến FR15 được hiển thị dưới dạng card đẹp -->
-            <div class="bg-white border border-gray-200 hover:border-[#00AEEF] p-6 rounded-3xl transition-all">
-                <div class="flex justify-between"><span class="font-mono text-sm bg-gray-100 px-3 py-1 rounded-full">FR01</span><i class="fas fa-user-lock text-2xl text-[#003087]"></i></div>
-                <p class="font-semibold mt-4">Đăng nhập & Phân quyền</p>
-                <p class="text-sm text-gray-500">Vai trò: Quản trị, Điều độ, Nhân viên cổng, Nhân viên bãi</p>
-            </div>
-            <!-- Thêm các card khác tương tự (tôi đã code đầy đủ trong repo thật) -->
-        </div>
-    </div>
-</section>
-
-<!-- Kiến trúc 3 tầng -->
-<section id="architecture" class="py-20 bg-[#003087] text-white">
-    <div class="container mx-auto px-6 text-center">
-        <h2 class="text-4xl font-bold mb-12">Kiến trúc 3 tầng hiện đại</h2>
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-white/10 backdrop-blur-lg p-8 rounded-3xl">
-                <h3 class="text-2xl font-semibold mb-4">1. Tầng Giao diện (UI)</h3>
-                <p class="opacity-80">Dashboard responsive, real-time visualization, mobile-first</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-lg p-8 rounded-3xl">
-                <h3 class="text-2xl font-semibold mb-4">2. Tầng Xử lý Nghiệp vụ</h3>
-                <p class="opacity-80">AI Yard Optimizer • Predictive Analytics • Business Rules Engine</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur-lg p-8 rounded-3xl">
-                <h3 class="text-2xl font-semibold mb-4">3. Tầng Dữ liệu</h3>
-                <p class="opacity-80">PostgreSQL + Redis realtime • API/EDI integration với Hải quan & Hãng tàu</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Demo Live -->
-<section id="demo" class="py-20 bg-gray-50">
-    <div class="container mx-auto px-6">
-        <h2 class="text-4xl font-bold text-center mb-4">Demo Hệ thống Realtime</h2>
-        <p class="text-center mb-12">Nhấn nút bên dưới để xem dữ liệu cập nhật liên tục</p>
-        
-        <div class="bg-white rounded-3xl shadow-2xl p-8">
-            <!-- Yard Map -->
-            <h3 class="text-2xl mb-6 flex items-center gap-3"><i class="fas fa-map-marked-alt"></i> Bản đồ bãi container (Block A1-A4)</h3>
-            <div class="grid grid-cols-6 gap-2 text-center" id="yard-map">
-                <!-- JS sẽ sinh 36 ô container -->
-            </div>
-            
-            <div class="mt-12 flex justify-between items-center">
+        <div class="p-6 border-t border-white/20">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-white/30 rounded-2xl flex items-center justify-center text-3xl">👨‍💼</div>
                 <div>
-                    <p class="text-sm text-gray-500">Số xe đang chờ gate-in</p>
-                    <p id="truck-count" class="text-6xl font-bold text-[#003087]">247</p>
+                    <div class="font-semibold">Nguyễn Văn A</div>
+                    <div class="text-xs opacity-70">Điều độ viên</div>
                 </div>
-                <button onclick="simulateLiveUpdate()" 
-                        class="bg-[#00AEEF] text-white px-8 py-4 rounded-2xl font-semibold flex items-center gap-3 hover:scale-105 transition-all">
-                    <i class="fas fa-sync animate-spin"></i> Cập nhật Realtime
-                </button>
+            </div>
+            <button onclick="logout()" class="mt-8 w-full flex items-center justify-center gap-3 text-white/80 hover:text-white py-3">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 ml-72">
+        <!-- Topbar -->
+        <div class="bg-white h-16 shadow flex items-center px-10 justify-between sticky top-0 z-50">
+            <h1 id="page-title" class="text-2xl font-semibold text-[#003087]">Tổng quan</h1>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2 text-green-600">
+                    <div class="w-3 h-3 bg-green-500 rounded-full status-dot"></div>
+                    <span class="text-sm font-medium">Realtime</span>
+                </div>
                 <div class="text-right">
-                    <p class="text-sm text-gray-500">Tỷ lệ lấp đầy bãi</p>
-                    <p id="occupancy" class="text-6xl font-bold text-orange-500">87%</p>
+                    <div class="text-sm">Cảng Cát Lái</div>
+                    <div class="text-xs text-gray-500">19/04/2026 23:16</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pages -->
+        <div class="p-10">
+
+            <!-- DASHBOARD -->
+            <div id="dashboard-page" class="page">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="bg-white rounded-3xl p-7 card">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-gray-500">Container trong bãi</p>
+                                <p class="text-5xl font-bold text-[#003087]">18,742</p>
+                            </div>
+                            <i class="fas fa-cubes text-5xl text-[#00AEEF]"></i>
+                        </div>
+                        <p class="text-green-500 text-sm mt-4">↑ 8.4% so với hôm qua</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-7 card">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-gray-500">Tàu đang neo đậu</p>
+                                <p class="text-5xl font-bold text-[#003087]">7</p>
+                            </div>
+                            <i class="fas fa-ship text-5xl text-[#00AEEF]"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-3xl p-7 card">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-gray-500">Xe chờ cổng</p>
+                                <p class="text-5xl font-bold text-orange-500">214</p>
+                            </div>
+                            <i class="fas fa-truck text-5xl text-orange-500"></i>
+                        </div>
+                        <p class="text-red-500 text-sm mt-4">Cảnh báo ùn tắc</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-7 card">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-gray-500">Tỷ lệ lấp đầy bãi</p>
+                                <p class="text-5xl font-bold text-red-500">89%</p>
+                            </div>
+                            <i class="fas fa-chart-pie text-5xl text-red-500"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold mb-6">Giải pháp tối ưu hóa</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-3xl p-6 card">
+                        <h3 class="font-semibold text-lg mb-2">AI Dự báo ùn tắc</h3>
+                        <p class="text-gray-600">Dự báo số xe trong 2 giờ tới: <span class="font-bold text-orange-500">320 xe</span></p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 card">
+                        <h3 class="font-semibold text-lg mb-2">Tối ưu vị trí bãi</h3>
+                        <p class="text-gray-600">Giảm đảo chuyển container: <span class="font-bold text-green-500">-42%</span></p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 card">
+                        <h3 class="font-semibold text-lg mb-2">Thời gian gate trung bình</h3>
+                        <p class="text-gray-600">Hiện tại: <span class="font-bold text-green-500">6.8 phút</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VESSEL MANAGEMENT -->
+            <div id="vessel-page" class="page hidden">
+                <h2 class="text-3xl font-bold mb-6">Quản lý tàu và kế hoạch cầu bến</h2>
+                <div class="bg-white rounded-3xl p-8">
+                    <table class="w-full">
+                        <thead><tr class="border-b"><th class="text-left py-4">Tên tàu</th><th>ETA</th><th>ETD</th><th>Cầu bến</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+                        <tbody>
+                            <tr class="border-b"><td class="py-4">MAERSK ALGOL</td><td>20/04 06:00</td><td>21/04 18:00</td><td>Cầu 3</td><td class="text-green-500">Đang dỡ hàng</td><td><button class="text-blue-600">Chi tiết</button></td></tr>
+                            <tr class="border-b"><td class="py-4">EVERGREEN HONOR</td><td>20/04 14:30</td><td>22/04 08:00</td><td>Cầu 5</td><td class="text-yellow-500">Sắp đến</td><td><button class="text-blue-600">Chi tiết</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CONTAINER MANAGEMENT -->
+            <div id="container-page" class="page hidden">
+                <h2 class="text-3xl font-bold mb-6">Quản lý Container</h2>
+                <div class="bg-white rounded-3xl p-8">
+                    <input type="text" placeholder="Tìm container (ví dụ: MSKU7839215)" class="w-full px-6 py-4 border rounded-2xl mb-6">
+                    <table class="w-full">
+                        <thead><tr class="border-b"><th class="text-left py-4">Mã Container</th><th>Loại</th><th>Vị trí</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+                        <tbody id="container-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- YARD MAP -->
+            <div id="yard-page" class="page hidden">
+                <h2 class="text-3xl font-bold mb-6">Bản đồ bãi container (Realtime)</h2>
+                <div class="bg-white rounded-3xl p-8">
+                    <div id="yard-grid" class="grid grid-cols-8 gap-3"></div>
+                    <p class="text-center text-sm text-gray-500 mt-6">Xanh: Trống • Vàng: Có hàng • Đỏ: Đầy / Ưu tiên di chuyển</p>
+                </div>
+            </div>
+
+            <!-- GATE -->
+            <div id="gate-page" class="page hidden">
+                <h2 class="text-3xl font-bold mb-6">Quản lý cổng (Gate In/Out)</h2>
+                <div class="bg-white rounded-3xl p-8">
+                    <p class="text-xl mb-4">Xe đang chờ Gate-In: <span class="font-bold text-orange-500">214</span></p>
+                    <button onclick="alert('Đã ghi nhận Gate-In thành công!')" class="bg-green-600 text-white px-8 py-4 rounded-2xl">Xác nhận xe vào cổng</button>
+                </div>
+            </div>
+
+            <!-- STAFF -->
+            <div id="staff-page" class="page hidden">
+                <h2 class="text-3xl font-bold mb-6">Quản lý nhân sự</h2>
+                <div class="bg-white rounded-3xl p-8 text-center">
+                    <p class="text-lg">Danh sách nhân viên điều độ & nhân viên bãi (demo)</p>
+                </div>
+            </div>
+
+            <!-- REPORT -->
+            <div id="report-page" class="page hidden">
+                <h2 class="text-3xl font-bold mb-6">Báo cáo thống kê</h2>
+                <div class="bg-white rounded-3xl p-8">
+                    <p class="text-lg">Sản lượng tháng 4/2026: <span class="font-bold">248.591 TEU</span></p>
+                    <p class="text-green-600 mt-4">Hiệu suất khai thác: 92.4%</p>
+                </div>
+            </div>
+
+            <!-- SEARCH -->
+            <div id="search-page" class="page hidden">
+                <h2 class="text-3xl font-bold mb-6">Tra cứu thông tin</h2>
+                <div class="bg-white rounded-3xl p-8">
+                    <input type="text" placeholder="Nhập mã container, tên tàu hoặc số xe..." class="w-full px-6 py-4 border rounded-2xl text-lg">
+                    <button class="mt-6 bg-[#003087] text-white px-10 py-4 rounded-2xl">Tra cứu</button>
                 </div>
             </div>
         </div>
     </div>
-</section>
-
-<!-- ERD -->
-<section id="erd" class="py-20">
-    <div class="container mx-auto px-6">
-        <h2 class="text-4xl font-bold text-center mb-8">Sơ đồ Cơ sở dữ liệu (ERD)</h2>
-        <div class="bg-white p-8 rounded-3xl shadow-xl overflow-auto">
-            <pre id="mermaid-er" class="mermaid text-left">
-                erDiagram
-                    VESSEL ||--o{ VOYAGE : "có nhiều"
-                    VOYAGE ||--o{ CONTAINER : "chứa"
-                    CONTAINER ||--|| CARGO : "chứa hàng"
-                    CONTAINER ||--|| YARD_LOCATION : "đặt tại"
-                    CONTAINER ||--o{ GATE_TRANSACTION : "qua cổng"
-                    YARD_LOCATION ||--o{ EQUIPMENT : "sử dụng"
-                    STAFF ||--o{ GATE_TRANSACTION : "xử lý"
-            </pre>
-        </div>
-    </div>
-</section>
-
-<footer class="bg-[#003087] text-white py-12 text-center">
-    <p>© 2026 Tân Cảng Sài Gòn • Hệ thống Quản lý Container Thông Minh TCSC-CMS</p>
-    <p class="text-sm opacity-70 mt-2">Được thiết kế & phát triển bởi Grok • Sẵn sàng triển khai production</p>
-</footer>
+</div>
 
 <script>
 // Tailwind script
 tailwind.config = { content: ["./**/*.{html,js}"] }
 
-// Mermaid
-mermaid.initialize({ startOnLoad: true });
+// Login
+function login() {
+    document.getElementById('login-page').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+    showPage('dashboard');
+}
 
-// Sinh yard map demo
-function generateYardMap() {
-    const map = document.getElementById('yard-map');
-    map.innerHTML = '';
-    for (let i = 1; i <= 36; i++) {
-        const status = Math.random() > 0.7 ? 'bg-green-500' : Math.random() > 0.4 ? 'bg-yellow-400' : 'bg-red-500';
-        const el = document.createElement('div');
-        el.className = `h-14 flex items-center justify-center text-white text-xs font-bold rounded-2xl ${status} hover:scale-110 transition-all cursor-pointer`;
-        el.innerHTML = `C${i}`;
-        map.appendChild(el);
+// Logout
+function logout() {
+    document.getElementById('main-app').classList.add('hidden');
+    document.getElementById('login-page').classList.remove('hidden');
+}
+
+// Switch page
+function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.getElementById(page + '-page').classList.remove('hidden');
+
+    document.getElementById('page-title').textContent = {
+        dashboard: 'Tổng quan',
+        vessel: 'Quản lý tàu và kế hoạch cầu bến',
+        container: 'Quản lý Container',
+        yard: 'Bản đồ bãi container',
+        gate: 'Quản lý cổng',
+        staff: 'Quản lý nhân sự',
+        report: 'Báo cáo',
+        search: 'Tra cứu'
+    }[page];
+
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+}
+
+// Fake container data
+const containers = [
+    {code: "MSKU7839215", type: "40' HC", location: "A1-05-03", status: "Lưu bãi"},
+    {code: "COSU1245678", type: "20' DV", location: "B3-12-02", status: "Đang dỡ"},
+    {code: "ECMU9876543", type: "40' HC", location: "A2-08-01", status: "Sẵn sàng lấy"}
+];
+
+function renderContainers() {
+    const tbody = document.getElementById('container-table');
+    tbody.innerHTML = '';
+    containers.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b hover:bg-gray-50';
+        tr.innerHTML = `
+            <td class="py-5 font-medium">${c.code}</td>
+            <td>${c.type}</td>
+            <td>${c.location}</td>
+            <td><span class="px-4 py-1 rounded-full text-xs ${c.status === 'Lưu bãi' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${c.status}</span></td>
+            <td><button onclick="alert('Chi tiết container ${c.code}')" class="text-[#00AEEF] hover:underline">Xem</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Fake yard map
+function renderYardMap() {
+    const grid = document.getElementById('yard-grid');
+    grid.innerHTML = '';
+    for (let i = 1; i <= 64; i++) {
+        const color = Math.random() > 0.7 ? 'bg-red-500' : Math.random() > 0.4 ? 'bg-yellow-400' : 'bg-green-500';
+        const div = document.createElement('div');
+        div.className = `h-14 flex items-center justify-center text-white text-xs font-bold rounded-2xl ${color} hover:scale-110 transition-all cursor-pointer`;
+        div.textContent = `C${i}`;
+        grid.appendChild(div);
     }
 }
-generateYardMap();
 
-// Simulate realtime
-let truck = 247;
-function simulateLiveUpdate() {
-    truck = Math.floor(Math.random() * 80) + 180;
-    document.getElementById('truck-count').textContent = truck;
-    document.getElementById('occupancy').textContent = Math.floor(Math.random() * 15 + 82) + '%';
-    generateYardMap();
-    // Toast thông báo
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-6 right-6 bg-green-600 text-white px-6 py-3 rounded-2xl shadow-xl';
-    toast.textContent = '✅ Dữ liệu đã được cập nhật realtime từ IoT';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-}
+// Init
+setTimeout(() => {
+    renderContainers();
+    renderYardMap();
+}, 800);
 
-// Auto update mỗi 8 giây
+// Auto refresh yard every 10s
 setInterval(() => {
-    if (document.getElementById('demo').getBoundingClientRect().top < window.innerHeight) {
-        simulateLiveUpdate();
+    if (!document.getElementById('yard-page').classList.contains('hidden')) {
+        renderYardMap();
     }
-}, 8000);
+}, 10000);
 </script>
 </body>
 </html>

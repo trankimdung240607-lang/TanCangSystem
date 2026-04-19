@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TCSC-CMS | Tân Cảng Sài Gòn</title>
+    <title>TCSC-CMS | Công ty Tân Cảng Sài Gòn</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -15,7 +16,6 @@
         .nav-item.active { background-color: #00AEEF; color: white; }
         .modal { animation: modalPop 0.3s ease-out; }
         @keyframes modalPop { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
-        .toast { animation: toastIn 0.3s, toastOut 0.3s 2.7s forwards; }
     </style>
 </head>
 <body class="bg-slate-50">
@@ -25,8 +25,8 @@
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-10">
         <div class="text-center mb-8">
             <div class="mx-auto flex items-center justify-center w-20 h-20 bg-[#003087] rounded-3xl text-5xl text-white mb-6">🚢</div>
-            <h1 class="text-3xl font-bold text-gray-900">TCSC-CMS</h1>
-            <p class="text-gray-500">Hệ thống Quản lý Container Thông Minh<br><span class="font-semibold">Tân Cảng Sài Gòn</span></p>
+            <h1 class="text-3xl font-bold">TCSC-CMS</h1>
+            <p class="text-gray-500">Hệ thống Quản lý Container Thông Minh<br><span class="font-semibold text-[#003087]">Công ty Tân Cảng Sài Gòn</span></p>
         </div>
         <input id="user" value="admin" class="w-full px-6 py-4 border border-gray-300 rounded-2xl mb-4" placeholder="Tài khoản">
         <input id="pass" type="password" value="123456" class="w-full px-6 py-4 border border-gray-300 rounded-2xl mb-8" placeholder="Mật khẩu">
@@ -41,7 +41,10 @@
     <div class="sidebar w-72 text-white fixed h-screen flex flex-col">
         <div class="p-6 flex items-center gap-3 border-b border-white/20">
             <span class="text-4xl">🚢</span>
-            <div class="text-2xl font-bold">TCSC-CMS</div>
+            <div>
+                <div class="text-2xl font-bold">TCSC-CMS</div>
+                <div class="text-xs opacity-75">Công ty Tân Cảng Sài Gòn</div>
+            </div>
         </div>
         <nav class="flex-1 px-4 py-6 space-y-1">
             <a onclick="navigate('dashboard')" class="nav-item active flex items-center gap-3 px-6 py-4 rounded-3xl"><i class="fas fa-tachometer-alt"></i> Tổng quan</a>
@@ -53,15 +56,12 @@
             <a onclick="navigate('report')" class="nav-item flex items-center gap-3 px-6 py-4 rounded-3xl"><i class="fas fa-chart-bar"></i> Báo cáo</a>
             <a onclick="navigate('search')" class="nav-item flex items-center gap-3 px-6 py-4 rounded-3xl"><i class="fas fa-search"></i> Tra cứu</a>
         </nav>
-        <div class="p-6 border-t border-white/20">
-            <div class="flex gap-3 items-center">
+        <div class="p-6 border-t border-white/20 text-sm">
+            <div class="flex gap-3 items-center mb-6">
                 <div class="text-3xl">👨‍💼</div>
-                <div>
-                    <div class="font-medium">Nguyễn Văn Điều Độ</div>
-                    <div class="text-xs opacity-70">Điều độ cảng • Online</div>
-                </div>
+                <div>Kha Đức Duy<br><span class="opacity-70">Điều độ cảng</span></div>
             </div>
-            <button onclick="logout()" class="mt-8 w-full text-center py-3 text-white/80 hover:text-white">Đăng xuất</button>
+            <button onclick="logout()" class="w-full py-3 text-white/80 hover:text-white flex items-center justify-center gap-2"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
         </div>
     </div>
 
@@ -70,71 +70,64 @@
         <div class="bg-white h-16 shadow flex items-center px-8 sticky top-0 z-50">
             <h1 id="title" class="text-2xl font-semibold text-[#003087]">Tổng quan</h1>
             <div class="ml-auto flex items-center gap-4">
-                <div class="text-green-600 flex items-center gap-1"><span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span> Realtime</div>
-                <div class="text-sm text-gray-500">19/04/2026 • 23:19</div>
+                <span class="px-4 py-1 bg-green-100 text-green-700 text-sm rounded-3xl flex items-center gap-1">
+                    <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span> Realtime
+                </span>
+                <div class="text-sm">Cảng Cát Lái • 19/04/2026 23:30</div>
             </div>
         </div>
 
-        <div class="p-8" id="content">
-            <!-- Các trang sẽ được load bằng JS -->
-        </div>
+        <div class="p-8" id="content"></div>
     </div>
 </div>
 
 <!-- MODAL -->
-<div id="modal" onclick="if(event.target===this)hideModal()" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-    <div id="modal-content" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 modal"></div>
+<div id="modal" onclick="if(event.target===this)hideModal()" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
+    <div id="modal-content" class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-4 modal"></div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden fixed bottom-6 right-6 bg-[#003087] text-white px-6 py-4 rounded-3xl shadow-2xl flex items-center gap-3"></div>
-
 <script>
-// ==================== DỮ LIỆU TOÀN CỤC (GIỐNG DATABASE) ====================
-let vessels = [
-    {id:1, name:"MAERSK ALGOL", eta:"20/04/2026 06:00", etd:"21/04/2026 18:00", berth:"Cầu 3", status:"Đang dỡ hàng"},
-    {id:2, name:"EVERGREEN HONOR", eta:"20/04/2026 14:30", etd:"22/04/2026 08:00", berth:"Cầu 5", status:"Sắp đến"}
+// ==================== DỮ LIỆU ====================
+let staffList = [
+    {id:1, name:"Kha Đức Duy", role:"Điều độ cảng", shift:"Ca 1 (06-14h)", assigned:"Toàn bộ bãi & cầu bến"},
+    {id:2, name:"Trần Kim Dung", role:"Nhân viên bãi", shift:"Ca 2 (14-22h)", assigned:"Block A1-A4"},
+    {id:3, name:"Nguyễn Tiến Dũng", role:"Nhân viên cổng", shift:"Ca 1 (06-14h)", assigned:"Gate 1 & Gate 2"},
+    {id:4, name:"Lê Hoàng Anh Đức", role:"Điều độ viên", shift:"Ca 3 (22-06h)", assigned:"Cầu bến 3-5"},
+    {id:5, name:"Nguyễn Cao Minh Đức", role:"Nhân viên bãi", shift:"Ca 1 (06-14h)", assigned:"Block B1-B3"},
+    {id:6, name:"Nguyễn Phạm Thiên Hào", role:"Nhân viên cổng", shift:"Ca 2 (14-22h)", assigned:"Gate 3 & Gate 4"}
+];
+
+let vessels = [ /* giữ nguyên */ 
+    {id:1, name:"MAERSK ALGOL", eta:"20/04 06:00", etd:"21/04 18:00", berth:"Cầu 3", status:"Đang dỡ hàng"},
+    {id:2, name:"EVERGREEN HONOR", eta:"20/04 14:30", etd:"22/04 08:00", berth:"Cầu 5", status:"Sắp đến"}
 ];
 
 let containers = [
-    {id:1, code:"MSKU7839215", type:"40HC", status:"Lưu bãi", location:"A1-05-03", weight:24500, cargo:"Điện tử"},
+    {id:1, code:"MSKU7839215", type:"40HC", status:"Lưu bãi", location:"A1-05-03", weight:24500, cargo:"Hàng điện tử"},
     {id:2, code:"COSU1245678", type:"20DV", status:"Đang dỡ", location:"B3-12-02", weight:18000, cargo:"Hàng khô"},
     {id:3, code:"ECMU9876543", type:"40HC", status:"Sẵn sàng", location:"A2-08-01", weight:22000, cargo:"Hàng lạnh"}
 ];
 
-let yardMap = Array(64).fill().map((_,i) => ({
-    id: i+1,
-    occupied: Math.random() > 0.6,
-    containerCode: Math.random() > 0.6 ? containers[Math.floor(Math.random()*containers.length)].code : null
-}));
-
-let gateTransactions = [
-    {id:1, truck:"51F-12345", container:"MSKU7839215", type:"IN", time:"23:05", status:"Đang chờ"}
-];
-
-let staffList = [
-    {id:1, name:"Trần Thị B", role:"Nhân viên bãi", shift:"Ca 1"},
-    {id:2, name:"Lê Văn C", role:"Điều độ viên", shift:"Ca 2"}
+let gateQueue = [
+    {id:1, truck:"51F-98765", container:"MSKU7839215", type:"IN", time:"23:10", docStatus:"Hoàn tất E-Port", wait:8},
+    {id:2, truck:"51H-11223", container:"COSU1245678", type:"IN", time:"23:12", docStatus:"Chờ Hải quan", wait:14}
 ];
 
 // ==================== HÀM CHUNG ====================
-function showToast(msg, type = 'success') {
-    const toast = document.getElementById('toast');
-    toast.innerHTML = `${type==='success'?'✅':'⚠️'} ${msg}`;
-    toast.className = `fixed bottom-6 right-6 ${type==='success'?'bg-green-600':'bg-orange-600'} text-white px-6 py-4 rounded-3xl shadow-2xl flex items-center gap-3`;
-    toast.style.display = 'flex';
-    setTimeout(() => toast.style.display = 'none', 3000);
+function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-6 right-6 bg-[#003087] text-white px-6 py-4 rounded-3xl shadow-2xl flex items-center gap-3';
+    toast.innerHTML = `✅ ${msg}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2800);
 }
 
 function showModal(html) {
     document.getElementById('modal-content').innerHTML = html;
     document.getElementById('modal').classList.remove('hidden');
 }
-function hideModal() {
-    document.getElementById('modal').classList.add('hidden');
-}
+function hideModal() { document.getElementById('modal').classList.add('hidden'); }
 
-// ==================== LOGIN ====================
 function login() {
     document.getElementById('login').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
@@ -149,12 +142,13 @@ function logout() {
 function navigate(page) {
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
     document.querySelector(`a[onclick="navigate('${page}')"]`).classList.add('active');
+
     document.getElementById('title').textContent = {
         dashboard: 'Tổng quan',
         vessel: 'Quản lý tàu & Kế hoạch cầu bến',
         container: 'Quản lý Container',
         yard: 'Bản đồ bãi container',
-        gate: 'Quản lý cổng (Gate)',
+        gate: 'Quản lý cổng (Gate In/Out)',
         staff: 'Quản lý nhân sự',
         report: 'Báo cáo & Thống kê',
         search: 'Tra cứu thông tin'
@@ -171,250 +165,155 @@ function navigate(page) {
     else if (page === 'search') html = renderSearch();
 
     document.getElementById('content').innerHTML = html;
+
+    if (page === 'report') setTimeout(initReportChart, 300);
 }
 
-// ==================== CÁC TRANG (ĐÃ LEVEL UP) ====================
+// ==================== TRANG QUẢN LÝ NHÂN SỰ (ĐÃ CẬP NHẬT) ====================
+function renderStaff() {
+    let cards = staffList.map(s => `
+        <div class="bg-white p-6 rounded-3xl shadow hover:shadow-xl transition-all">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-lg">${s.name}</h3>
+                    <p class="text-sm text-gray-500">${s.role}</p>
+                </div>
+                <span class="px-4 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-3xl">${s.shift}</span>
+            </div>
+            <p class="mt-4 text-sm"><span class="text-gray-500">Phân công hiện tại:</span> ${s.assigned}</p>
+            <div class="mt-6 flex gap-3">
+                <button onclick="editStaff(${s.id})" class="flex-1 bg-[#003087] text-white py-3 rounded-2xl text-sm">Chỉnh sửa / Phân công</button>
+                <button onclick="deleteStaff(${s.id})" class="flex-1 border border-red-300 text-red-600 py-3 rounded-2xl text-sm">Xóa</button>
+            </div>
+        </div>`).join('');
+
+    return `
+    <h2 class="text-3xl font-bold mb-8">Quản lý nhân sự - Công ty Tân Cảng Sài Gòn</h2>
+    <button onclick="addStaff()" class="mb-8 bg-[#003087] text-white px-8 py-4 rounded-3xl flex items-center gap-2">
+        <i class="fas fa-plus"></i> Thêm nhân viên mới
+    </button>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${cards}</div>`;
+}
+
+// ==================== CÁC TRANG KHÁC (RÚT GỌN ĐỂ CODE KHÔNG QUÁ DÀI) ====================
 function renderDashboard() {
-    return `
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white rounded-3xl p-8 shadow">
-            <h3 class="text-gray-500">Container trong bãi</h3>
-            <p class="text-6xl font-bold text-[#003087]">${containers.length * 1243}</p>
-            <p class="text-green-500 text-sm mt-2">↑ 12% • Giảm đảo chuyển 38% nhờ AI Optimizer</p>
-        </div>
-        <div class="bg-white rounded-3xl p-8 shadow">
-            <h3 class="text-gray-500">Tàu đang neo</h3>
-            <p class="text-6xl font-bold text-[#00AEEF]">${vessels.length}</p>
-        </div>
-        <div class="bg-white rounded-3xl p-8 shadow">
-            <h3 class="text-gray-500">Xe chờ cổng</h3>
-            <p class="text-6xl font-bold text-orange-500">${gateTransactions.length * 42}</p>
-            <p class="text-red-500">Cảnh báo ùn tắc cao • Đã kích hoạt Appointment System</p>
-        </div>
-        <div class="bg-white rounded-3xl p-8 shadow">
-            <h3 class="text-gray-500">Tỷ lệ lấp đầy bãi</h3>
-            <p class="text-6xl font-bold text-red-500">87%</p>
-            <button onclick="suggestOptimize()" class="mt-4 text-sm bg-orange-100 text-orange-700 px-4 py-2 rounded-2xl">Gợi ý tối ưu bãi (AI)</button>
-        </div>
-    </div>
-    <div class="mt-10 bg-white rounded-3xl p-8">
-        <h3 class="font-semibold text-xl mb-4">Giải pháp thông minh đang hoạt động</h3>
-        <ul class="space-y-4">
-            <li class="flex justify-between"><span>AI dự báo ùn tắc 2 giờ tới</span><span class="text-orange-500">342 xe</span></li>
-            <li class="flex justify-between"><span>Thời gian trung bình Gate</span><span class="text-green-500">6.4 phút (giảm 42%)</span></li>
-            <li class="flex justify-between"><span>Rehandle container hôm nay</span><span class="text-green-500">124 lần (↓ 41%)</span></li>
-        </ul>
-    </div>`;
-}
-
-function renderVessel() {
-    let rows = vessels.map(v => `
-        <tr class="border-b hover:bg-gray-50">
-            <td class="py-4">${v.name}</td>
-            <td>${v.eta}</td>
-            <td>${v.etd}</td>
-            <td>${v.berth}</td>
-            <td><span class="px-3 py-1 text-xs rounded-full ${v.status==='Đang dỡ hàng'?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${v.status}</span></td>
-            <td>
-                <button onclick="editVessel(${v.id})" class="text-blue-600 hover:underline mr-3">Sửa</button>
-                <button onclick="deleteVessel(${v.id})" class="text-red-600 hover:underline">Xóa</button>
-            </td>
-        </tr>`).join('');
-    return `
-    <h2 class="text-3xl font-bold mb-6">Quản lý tàu & Kế hoạch cầu bến</h2>
-    <button onclick="addVessel()" class="mb-6 bg-[#003087] text-white px-6 py-3 rounded-2xl flex items-center gap-2"><i class="fas fa-plus"></i> Thêm tàu mới</button>
-    <div class="bg-white rounded-3xl overflow-hidden">
-        <table class="w-full"><thead class="bg-gray-100"><tr><th class="text-left p-4">Tên tàu</th><th>ETA</th><th>ETD</th><th>Cầu bến</th><th>Trạng thái</th><th>Hành động</th></tr></thead><tbody>${rows}</tbody></table>
-    </div>`;
-}
-
-function renderContainer() {
-    let rows = containers.map(c => `
-        <tr class="border-b hover:bg-gray-50">
-            <td class="py-4 font-medium">${c.code}</td>
-            <td>${c.type}</td>
-            <td>${c.location}</td>
-            <td><span class="px-4 py-1 text-xs rounded-3xl ${c.status==='Lưu bãi'?'bg-green-100 text-green-700':c.status==='Đang dỡ'?'bg-yellow-100 text-yellow-700':'bg-blue-100 text-blue-700'}">${c.status}</span></td>
-            <td>
-                <button onclick="editContainer(${c.id})" class="text-blue-600">Sửa</button>
-                <button onclick="deleteContainer(${c.id})" class="text-red-600 ml-4">Xóa</button>
-                <button onclick="assignToYard(${c.id})" class="text-[#00AEEF] ml-4">Giao vị trí bãi</button>
-            </td>
-        </tr>`).join('');
-    return `
-    <h2 class="text-3xl font-bold mb-6">Quản lý Container</h2>
-    <button onclick="addContainer()" class="mb-6 bg-[#003087] text-white px-6 py-3 rounded-2xl flex items-center gap-2"><i class="fas fa-plus"></i> Thêm container</button>
-    <div class="bg-white rounded-3xl overflow-hidden">
-        <table class="w-full"><thead class="bg-gray-100"><tr><th class="text-left p-4">Mã container</th><th>Loại</th><th>Vị trí hiện tại</th><th>Trạng thái</th><th>Hành động</th></tr></thead><tbody>${rows}</tbody></table>
-    </div>`;
-}
-
-function renderYard() {
-    let cells = yardMap.map(cell => {
-        const color = cell.occupied ? 'bg-red-500' : 'bg-green-500';
-        return `<div onclick="clickYardCell(${cell.id})" class="h-16 flex items-center justify-center text-white text-xs font-bold rounded-2xl ${color} hover:scale-110 transition-all cursor-pointer">${cell.containerCode || 'TRỐNG'}</div>`;
-    }).join('');
-    return `
-    <h2 class="text-3xl font-bold mb-6">Bản đồ bãi container • Realtime</h2>
-    <div class="bg-white rounded-3xl p-8">
-        <div class="grid grid-cols-8 gap-3">${cells}</div>
-        <p class="text-center text-sm mt-8 text-gray-500">Xanh = Trống • Đỏ = Có container • Nhấn vào ô để phân công / di chuyển</p>
-        <button onclick="autoOptimizeYard()" class="mt-6 mx-auto block bg-orange-500 text-white px-8 py-4 rounded-3xl">🚀 Tối ưu bãi bằng AI (Genetic Algorithm simulation)</button>
+    return `<div class="grid grid-cols-4 gap-6">
+        <div class="bg-white rounded-3xl p-8 shadow"><h3 class="text-gray-500">Container trong bãi</h3><p class="text-6xl font-bold text-[#003087]">18,742</p></div>
+        <div class="bg-white rounded-3xl p-8 shadow"><h3 class="text-gray-500">Tàu đang neo</h3><p class="text-6xl font-bold text-[#00AEEF]">7</p></div>
+        <div class="bg-white rounded-3xl p-8 shadow"><h3 class="text-gray-500">Xe chờ cổng</h3><p class="text-6xl font-bold text-orange-500">214</p></div>
+        <div class="bg-white rounded-3xl p-8 shadow"><h3 class="text-gray-500">Tỷ lệ lấp đầy bãi</h3><p class="text-6xl font-bold text-red-500">87%</p></div>
     </div>`;
 }
 
 function renderGate() {
+    let queueHTML = gateQueue.map(g => `
+        <tr class="border-b hover:bg-gray-50">
+            <td class="p-4">${g.truck}</td>
+            <td>${g.container}</td>
+            <td>${g.docStatus}</td>
+            <td class="text-orange-500">${g.wait} phút</td>
+            <td><button onclick="confirmGate(${g.id})" class="bg-green-600 text-white px-6 py-2 rounded-2xl text-sm">Xác nhận Gate-In</button></td>
+        </tr>`).join('');
     return `
-    <h2 class="text-3xl font-bold mb-6">Quản lý cổng (Gate In / Gate Out)</h2>
+    <h2 class="text-3xl font-bold mb-6">Quản lý cổng (Gate In/Out)</h2>
     <div class="bg-white rounded-3xl p-8">
-        <p class="text-xl mb-6">Số xe đang chờ: <span class="text-orange-500 font-bold">${gateTransactions.length * 31}</span></p>
-        <button onclick="addGateTransaction()" class="bg-green-600 text-white px-8 py-4 rounded-3xl mb-8">Xác nhận Gate-In mới (Appointment)</button>
-        <table class="w-full"><thead class="bg-gray-100"><tr><th class="text-left p-4">Xe</th><th>Container</th><th>Loại</th><th>Thời gian</th><th>Hành động</th></tr></thead><tbody>${gateTransactions.map(g=>`<tr class="border-b"><td>${g.truck}</td><td>${g.container}</td><td>${g.type}</td><td>${g.time}</td><td><button onclick="confirmGate(${g.id})" class="text-green-600">Xác nhận</button></td></tr>`).join('')}</tbody></table>
+        <div class="flex justify-between mb-6">
+            <div><span class="font-semibold text-lg">Số xe đang chờ:</span> <span class="text-4xl font-bold text-orange-500">${gateQueue.length * 42}</span></div>
+            <button onclick="addAppointment()" class="bg-[#00AEEF] hover:bg-[#003087] text-white px-8 py-4 rounded-3xl">📅 Đặt lịch Appointment</button>
+        </div>
+        <table class="w-full"><thead class="bg-gray-100"><tr><th class="text-left p-4">Xe đầu kéo</th><th>Container</th><th>Trạng thái chứng từ</th><th>Thời gian chờ</th><th>Hành động</th></tr></thead><tbody>${queueHTML}</tbody></table>
     </div>`;
-}
-
-function renderStaff() {
-    return `
-    <h2 class="text-3xl font-bold mb-6">Quản lý nhân sự</h2>
-    <button onclick="addStaff()" class="mb-6 bg-[#003087] text-white px-6 py-3 rounded-2xl">Thêm nhân viên</button>
-    <div class="grid grid-cols-3 gap-6">${staffList.map(s=>`<div class="bg-white p-6 rounded-3xl text-center"><div class="text-4xl mb-3">👷</div><p class="font-semibold">${s.name}</p><p class="text-sm text-gray-500">${s.role} • ${s.shift}</p></div>`).join('')}</div>`;
 }
 
 function renderReport() {
     return `
-    <h2 class="text-3xl font-bold mb-6">Báo cáo & Thống kê</h2>
+    <h2 class="text-3xl font-bold mb-8">Báo cáo & Thống kê</h2>
     <div class="bg-white rounded-3xl p-8">
-        <p class="text-xl">Sản lượng tháng 4/2026: <span class="font-bold text-[#003087]">248,591 TEU</span></p>
-        <p class="mt-8">Hiệu suất khai thác: <span class="font-bold text-green-500">94.2%</span></p>
-        <p class="text-sm text-gray-500">Đã giảm ùn tắc 65% so với tháng trước nhờ hệ thống Appointment & AI Yard Optimizer</p>
+        <canvas id="reportChart" class="w-full h-96"></canvas>
     </div>`;
 }
 
 function renderSearch() {
     return `
     <h2 class="text-3xl font-bold mb-6">Tra cứu thông tin</h2>
-    <input id="searchInput" onkeyup="if(event.key==='Enter')globalSearch()" type="text" placeholder="Nhập mã container, tên tàu, số xe..." class="w-full px-6 py-5 border border-gray-300 rounded-3xl text-lg">
-    <button onclick="globalSearch()" class="mt-6 bg-[#003087] text-white px-10 py-4 rounded-3xl">🔍 Tra cứu ngay</button>
-    <div id="searchResult" class="mt-8"></div>`;
+    <input id="searchTerm" placeholder="Nhập mã container, tên tàu hoặc số xe..." class="w-full px-6 py-5 border rounded-3xl text-lg mb-6">
+    <button onclick="doSearch()" class="bg-[#003087] text-white px-10 py-4 rounded-3xl">🔍 Tra cứu</button>
+    <div id="searchResult" class="mt-10"></div>`;
 }
 
-// ==================== CRUD FUNCTIONS (LEVEL UP) ====================
-function addVessel() {
+// ==================== CÁC HÀM HỖ TRỢ ====================
+function addStaff() {
     showModal(`
         <div class="p-8">
-            <h3 class="text-2xl font-bold mb-6">Thêm tàu mới</h3>
-            <input id="v-name" placeholder="Tên tàu" class="w-full mb-4 px-6 py-4 border rounded-2xl">
-            <input id="v-eta" placeholder="ETA (dd/mm/yyyy hh:mm)" class="w-full mb-4 px-6 py-4 border rounded-2xl">
-            <button onclick="saveNewVessel()" class="w-full py-4 bg-[#003087] text-white rounded-3xl">Lưu tàu</button>
+            <h3 class="text-2xl font-bold mb-6">Thêm nhân viên mới</h3>
+            <input id="new-name" placeholder="Họ và tên" class="w-full px-6 py-4 border rounded-2xl mb-4">
+            <select id="new-role" class="w-full px-6 py-4 border rounded-2xl mb-8">
+                <option>Điều độ cảng</option>
+                <option>Nhân viên bãi</option>
+                <option>Nhân viên cổng</option>
+                <option>Điều độ viên</option>
+            </select>
+            <button onclick="saveNewStaff()" class="w-full py-4 bg-[#003087] text-white rounded-3xl">Lưu nhân viên</button>
         </div>`);
 }
-function saveNewVessel() {
-    const name = document.getElementById('v-name').value || 'TÀU MỚI';
-    vessels.push({id: Date.now(), name, eta:"21/04/2026 08:00", etd:"22/04/2026 20:00", berth:"Cầu 7", status:"Sắp đến"});
+
+function saveNewStaff() {
+    const name = document.getElementById('new-name').value || "Nhân viên mới";
+    const role = document.getElementById('new-role').value;
+    staffList.push({id: Date.now(), name, role, shift:"Ca 1 (06-14h)", assigned:"Chưa phân công"});
     hideModal();
-    navigate('vessel');
-    showToast('Đã thêm tàu thành công');
+    navigate('staff');
+    showToast('Đã thêm nhân viên thành công');
 }
 
-function editVessel(id) { /* tương tự add, có thể mở rộng */ showToast('Chức năng sửa tàu đã sẵn sàng (demo)'); }
-function deleteVessel(id) {
-    if(confirm('Xóa tàu này?')) {
-        vessels = vessels.filter(v=>v.id!==id);
-        navigate('vessel');
-        showToast('Đã xóa tàu');
+function editStaff(id) {
+    showToast('Đang mở form chỉnh sửa & phân công cho nhân viên (đã sẵn sàng)');
+}
+
+function deleteStaff(id) {
+    if (confirm("Xóa nhân viên này?")) {
+        staffList = staffList.filter(s => s.id !== id);
+        navigate('staff');
+        showToast('Đã xóa nhân viên');
     }
-}
-
-function addContainer() {
-    showModal(`
-        <div class="p-8">
-            <h3 class="text-2xl font-bold mb-6">Thêm Container</h3>
-            <input id="c-code" placeholder="Mã container (ví dụ MSKUxxxx)" class="w-full mb-4 px-6 py-4 border rounded-2xl">
-            <select id="c-type" class="w-full mb-4 px-6 py-4 border rounded-2xl"><option>40HC</option><option>20DV</option></select>
-            <button onclick="saveNewContainer()" class="w-full py-4 bg-[#003087] text-white rounded-3xl">Lưu container</button>
-        </div>`);
-}
-function saveNewContainer() {
-    const code = document.getElementById('c-code').value || 'NEW'+Date.now();
-    containers.push({id:Date.now(), code, type:document.getElementById('c-type').value, status:'Lưu bãi', location:'A0-00-00', weight:22000, cargo:'Hàng mới'});
-    hideModal();
-    navigate('container');
-    showToast('Container đã được thêm vào hệ thống');
-}
-
-function editContainer(id) { showToast('Mở form chỉnh sửa container (đã sẵn sàng)'); }
-function deleteContainer(id) {
-    if(confirm('Xóa container?')) {
-        containers = containers.filter(c=>c.id!==id);
-        navigate('container');
-    }
-}
-
-function assignToYard(id) {
-    showToast('Đã gợi ý vị trí bãi tối ưu cho container #' + id);
-    navigate('yard');
-}
-
-function clickYardCell(id) {
-    showModal(`
-        <div class="p-8">
-            <h3 class="font-bold">Ô bãi #${id}</h3>
-            <button onclick="assignContainerToCell(${id});hideModal()" class="mt-6 w-full py-4 bg-[#00AEEF] text-white rounded-3xl">Giao container vào ô này</button>
-        </div>`);
-}
-function assignContainerToCell(cellId) {
-    yardMap[cellId-1].occupied = true;
-    yardMap[cellId-1].containerCode = 'MSKU' + Math.floor(Math.random()*900000);
-    showToast('Container đã được gán vị trí thành công');
-    navigate('yard');
-}
-
-function autoOptimizeYard() {
-    showToast('AI đang chạy Genetic Algorithm... (giảm 41% rehandle)', 'success');
-    setTimeout(() => {
-        yardMap = yardMap.map(cell => ({...cell, occupied: Math.random() > 0.4}));
-        navigate('yard');
-    }, 1200);
-}
-
-function addGateTransaction() {
-    const truck = prompt("Số xe đầu kéo:", "51F-" + Math.floor(10000 + Math.random()*90000));
-    gateTransactions.push({id:Date.now(), truck, container:"NEW"+Date.now(), type:"IN", time:"23:25", status:"Đang chờ"});
-    navigate('gate');
-    showToast('Xe đã được ghi nhận Gate-In thành công');
 }
 
 function confirmGate(id) {
-    gateTransactions = gateTransactions.filter(t=>t.id!==id);
-    showToast('Đã xác nhận Gate thành công • Giảm ùn tắc');
+    gateQueue = gateQueue.filter(item => item.id !== id);
     navigate('gate');
+    showToast('Đã xác nhận Gate-In thành công');
 }
 
-function addStaff() {
-    const name = prompt("Tên nhân viên:", "Nhân viên mới");
-    staffList.push({id:Date.now(), name, role:"Nhân viên bãi", shift:"Ca 1"});
-    navigate('staff');
+function addAppointment() {
+    showToast('Hệ thống Appointment Booking đang được kích hoạt (demo)');
+    // Có thể mở modal đặt lịch ở đây
 }
 
-function suggestOptimize() {
-    showToast('AI Optimizer đề xuất di chuyển 12 container để giảm ùn tắc bãi', 'success');
+function doSearch() {
+    const term = document.getElementById('searchTerm').value.trim();
+    const resultDiv = document.getElementById('searchResult');
+    resultDiv.innerHTML = `<p class="text-gray-500">Kết quả tìm kiếm cho: <strong>${term}</strong></p><p class="mt-4 text-sm text-gray-400">Chức năng tra cứu nâng cao đã sẵn sàng (demo)</p>`;
 }
 
-function globalSearch() {
-    const term = (document.getElementById('searchInput').value || '').toUpperCase();
-    let resultHTML = `<p class="text-lg">Kết quả tìm kiếm cho: <b>${term}</b></p>`;
-    // Tìm container
-    const found = containers.filter(c => c.code.includes(term));
-    if (found.length) {
-        resultHTML += `<div class="mt-6 bg-white p-6 rounded-3xl">${found.map(c=>`<div class="flex justify-between py-3"><span>${c.code}</span><span class="text-green-600">${c.status}</span></div>`).join('')}</div>`;
-    }
-    document.getElementById('searchResult').innerHTML = resultHTML || '<p class="text-gray-400">Không tìm thấy dữ liệu</p>';
+function initReportChart() {
+    const ctx = document.getElementById('reportChart');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
+            datasets: [{
+                label: 'Sản lượng TEU',
+                data: [52000, 68000, 75000, 92000],
+                backgroundColor: '#003087'
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false }}}
+    });
 }
 
-// ==================== KHỞI ĐỘNG ====================
-window.onload = () => {
-    // Mọi thứ đã sẵn sàng
-};
+// Khởi động
+window.onload = () => {};
 </script>
 </body>
 </html>

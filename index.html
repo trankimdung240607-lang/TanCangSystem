@@ -14,7 +14,9 @@
         .nav-item { transition: all 0.3s; }
         .nav-item:hover { background-color: rgba(0,174,239,0.15); }
         .nav-item.active { background-color: #00AEEF; color: white; }
-        .yard-cell:hover { transform: scale(1.15); }
+        .yard-cell:hover { transform: scale(1.18); box-shadow: 0 0 15px rgba(0,174,239,0.6); }
+        .kpi-card { transition: all 0.3s; }
+        .kpi-card:hover { transform: translateY(-8px); }
     </style>
 </head>
 <body class="bg-slate-50">
@@ -36,6 +38,7 @@
 
 <!-- MAIN APP -->
 <div id="main-app" class="hidden flex min-h-screen">
+    <!-- SIDEBAR -->
     <div class="sidebar w-72 text-white fixed h-screen flex flex-col">
         <div class="p-6 flex items-center gap-3 border-b border-white/20">
             <span class="text-4xl">🚢</span>
@@ -63,6 +66,7 @@
         </div>
     </div>
 
+    <!-- CONTENT -->
     <div class="flex-1 ml-72">
         <div class="bg-white h-16 shadow flex items-center px-8 sticky top-0 z-50">
             <h1 id="page-title" class="text-2xl font-semibold text-[#003087]">Tổng quan</h1>
@@ -86,68 +90,48 @@ let vessels = [
     {id:1, name:"MAERSK ALGOL", eta:"20/04 06:00", etd:"21/04 18:00", berth:"Cầu 3", status:"Đang dỡ hàng", teu:1248},
     {id:2, name:"EVERGREEN HONOR", eta:"20/04 14:30", etd:"22/04 08:00", berth:"Cầu 5", status:"Sắp đến", teu:856},
     {id:3, name:"MSC SILVIA", eta:"20/04 22:00", etd:"22/04 12:00", berth:"Cầu 2", status:"Đang neo", teu:1120},
-    {id:4, name:"COSCO SHANGHAI", eta:"21/04 08:00", etd:"23/04 06:00", berth:"Cầu 4", status:"Sắp đến", teu:980}
+    {id:4, name:"COSCO SHANGHAI", eta:"21/04 08:00", etd:"23/04 06:00", berth:"Cầu 4", status:"Sắp đến", teu:980},
+    {id:5, name:"HMM ALGECIRAS", eta:"21/04 16:00", etd:"23/04 10:00", berth:"Cầu 6", status:"Đang dỡ hàng", teu:1350}
 ];
 
 let containers = [
     {id:1, code:"MSKU7839215", type:"40HC", status:"Lưu bãi", location:"A1-05-03"},
     {id:2, code:"COSU1245678", type:"20DV", status:"Đang dỡ", location:"B3-12-02"},
     {id:3, code:"ECMU9876543", type:"40HC", status:"Sẵn sàng", location:"A2-08-01"},
-    {id:4, code:"HMMU5554321", type:"40HC", status:"Lưu bãi", location:"A3-07-04"}
+    {id:4, code:"HMMU5554321", type:"40HC", status:"Lưu bãi", location:"A3-07-04"},
+    {id:5, code:"MSCU8765432", type:"20DV", status:"Đang dỡ", location:"B2-11-05"}
 ];
 
 let gateQueue = [
-    {id:1, truck:"51F-98765", container:"MSKU7839215", docStatus:"Hoàn tất E-Port", wait:8}
+    {id:1, truck:"51F-98765", container:"MSKU7839215", docStatus:"Hoàn tất E-Port", wait:8},
+    {id:2, truck:"51H-11223", container:"COSU1245678", docStatus:"Chờ Hải quan", wait:14},
+    {id:3, truck:"51K-44556", container:"HMMU5554321", docStatus:"Hoàn tất E-Port", wait:5}
 ];
 
-// Dữ liệu 6 loại container
+let yardMap = Array(64).fill().map((_, i) => ({
+    id: i+1,
+    code: (i < containers.length) ? containers[i].code : (Math.random() > 0.65 ? containers[Math.floor(Math.random()*containers.length)].code : null),
+    status: Math.random() > 0.6 ? 'đầy' : 'trống'
+}));
+
+// ==================== DỮ LIỆU 6 LOẠI CONTAINER ====================
 let containerTypes = [
-    {
-        name: "Container khô", code: "DV / GP", icon: "📦",
-        desc: "Container khô (Dry Container / General Purpose) là loại container phổ biến nhất, được thiết kế cho hàng hóa thông thường không yêu cầu kiểm soát nhiệt độ.",
-        sizes: "20ft, 40ft, 40HC",
-        cargos: "Hàng điện tử, quần áo, giày dép, thực phẩm đóng gói khô, máy móc nhỏ, vật liệu xây dựng, đồ gia dụng"
-    },
-    {
-        name: "Container cao", code: "HC (High Cube)", icon: "📦⬆️",
-        desc: "Container cao (High Cube Container) có chiều cao lớn hơn khoảng 30cm, phù hợp cho hàng hóa nhẹ nhưng chiếm nhiều thể tích.",
-        sizes: "40HC",
-        cargos: "Đồ nội thất, quần áo may mặc, bông sợi, hàng hóa cồng kềnh nhẹ, giấy cuộn, hàng dệt may"
-    },
-    {
-        name: "Container lạnh", code: "Reefer", icon: "❄️",
-        desc: "Container lạnh (Reefer Container) được trang bị máy lạnh để duy trì nhiệt độ ổn định cho hàng hóa dễ hỏng.",
-        sizes: "20ft, 40ft, 40HC",
-        cargos: "Thủy hải sản đông lạnh, trái cây tươi, rau củ quả, thịt tươi đông lạnh, dược phẩm, sữa tươi, hoa tươi"
-    },
-    {
-        name: "Container mặt phẳng", code: "FR (Flat Rack)", icon: "🛠️",
-        desc: "Container mặt phẳng không có vách bên và mái, cho phép bốc dỡ hàng quá khổ.",
-        sizes: "20ft, 40ft",
-        cargos: "Máy móc công nghiệp lớn, xe ô tô, xe máy, ống thép, gỗ tròn, thiết bị nặng"
-    },
-    {
-        name: "Container hở mái", code: "OT (Open Top)", icon: "🔝",
-        desc: "Container hở mái có mái có thể tháo rời, cho phép bốc dỡ hàng từ trên xuống bằng cần cẩu.",
-        sizes: "20ft, 40ft",
-        cargos: "Máy móc nặng, ống thép dài, gỗ xẻ, hàng hóa quá cao, thiết bị xây dựng"
-    },
-    {
-        name: "Container bồn", code: "Tank", icon: "🛢️",
-        desc: "Container bồn chuyên dụng để vận chuyển chất lỏng, khí nén hoặc hàng hóa nguy hiểm.",
-        sizes: "20ft, 40ft",
-        cargos: "Xăng dầu, hóa chất lỏng, rượu vang, nước sốt, khí hóa lỏng, thực phẩm lỏng"
-    }
+    { name: "Container khô", code: "DV / GP", icon: "📦", desc: "Loại container phổ biến nhất cho hàng hóa thông thường.", sizes: "20ft, 40ft, 40HC", cargos: "Hàng điện tử, quần áo, giày dép, thực phẩm khô, máy móc nhỏ, vật liệu xây dựng" },
+    { name: "Container cao", code: "HC (High Cube)", icon: "📦⬆️", desc: "Container có chiều cao lớn hơn tiêu chuẩn 30cm.", sizes: "40HC", cargos: "Đồ nội thất, quần áo may mặc, bông sợi, hàng cồng kềnh nhẹ" },
+    { name: "Container lạnh", code: "Reefer", icon: "❄️", desc: "Container có hệ thống làm lạnh để bảo quản hàng dễ hỏng.", sizes: "20ft, 40ft, 40HC", cargos: "Thủy hải sản đông lạnh, trái cây tươi, thịt, rau củ, dược phẩm" },
+    { name: "Container mặt phẳng", code: "FR (Flat Rack)", icon: "🛠️", desc: "Không có vách bên và mái, dùng cho hàng quá khổ.", sizes: "20ft, 40ft", cargos: "Máy móc lớn, xe ô tô, ống thép, gỗ tròn, thiết bị nặng" },
+    { name: "Container hở mái", code: "OT (Open Top)", icon: "🔝", desc: "Mái có thể tháo rời để bốc dỡ từ trên xuống.", sizes: "20ft, 40ft", cargos: "Máy móc nặng, ống thép dài, gỗ xẻ, hàng quá cao" },
+    { name: "Container bồn", code: "Tank", icon: "🛢️", desc: "Dùng chuyên chở chất lỏng và hàng nguy hiểm.", sizes: "20ft, 40ft", cargos: "Xăng dầu, hóa chất lỏng, rượu vang, khí hóa lỏng" }
 ];
 
-// ==================== DỮ LIỆU NHÂN SỰ (MỚI BỔ SUNG) ====================
+// ==================== DỮ LIỆU NHÂN SỰ (ĐÃ CẬP NHẬT) ====================
 let staffList = [
-    { id: 1, name: "Kha Đức Duy", position: "Trưởng ca khai thác", department: "Khai thác cảng", phone: "0912 345 678", email: "duy.kha@tanhcang.com", status: "Đang làm việc", avatar: "👨‍💼" },
-    { id: 2, name: "Trần Kim Dung", position: "Nhân viên lập kế hoạch", department: "Kế hoạch & Điều độ", phone: "0987 654 321", email: "dung.tran@tanhcang.com", status: "Đang làm việc", avatar: "👩‍💼" },
-    { id: 3, name: "Nguyễn Tiến Dũng", position: "Giám sát bãi container", department: "Vận hành bãi", phone: "0934 567 890", email: "dung.nguyen@tanhcang.com", status: "Đang làm việc", avatar: "👨‍🔧" },
-    { id: 4, name: "Lê Hoàng Anh Đức", position: "Điều phối tàu", department: "Khai thác tàu", phone: "0901 234 567", email: "duc.le@tanhcang.com", status: "Đang làm việc", avatar: "👨‍✈️" },
-    { id: 5, name: "Nguyễn Cao Minh Đức", position: "Nhân viên kỹ thuật", department: "Kỹ thuật thiết bị", phone: "0978 123 456", email: "minhduc.nguyen@tanhcang.com", status: "Đang làm việc", avatar: "🛠️" },
-    { id: 6, name: "Nguyễn Phạm Thiên Hào", position: "Nhân viên cổng", department: "Quản lý cổng", phone: "0965 432 109", email: "hao.nguyen@tanhcang.com", status: "Đang làm việc", avatar: "🚛" }
+    {id:1, name:"Kha Đức Duy", role:"Trưởng ca khai thác", shift:"Ca 1 (06-14h)", assigned:"Toàn bộ hoạt động cảng", phone:"0912 345 678", email:"duy.kha@tanhcang.com"},
+    {id:2, name:"Trần Kim Dung", role:"Nhân viên lập kế hoạch", shift:"Ca 2 (14-22h)", assigned:"Kế hoạch & Điều độ", phone:"0987 654 321", email:"dung.tran@tanhcang.com"},
+    {id:3, name:"Nguyễn Tiến Dũng", role:"Giám sát bãi container", shift:"Ca 1 (06-14h)", assigned:"Block A1-A4", phone:"0934 567 890", email:"dung.nguyen@tanhcang.com"},
+    {id:4, name:"Lê Hoàng Anh Đức", role:"Điều phối tàu", shift:"Ca 3 (22-06h)", assigned:"Cầu bến 3-5", phone:"0901 234 567", email:"duc.le@tanhcang.com"},
+    {id:5, name:"Nguyễn Cao Minh Đức", role:"Nhân viên kỹ thuật", shift:"Ca 1 (06-14h)", assigned:"Kỹ thuật thiết bị", phone:"0978 123 456", email:"minhduc.nguyen@tanhcang.com"},
+    {id:6, name:"Nguyễn Phạm Thiên Hào", role:"Nhân viên cổng", shift:"Ca 2 (14-22h)", assigned:"Gate 3-4", phone:"0965 432 109", email:"hao.nguyen@tanhcang.com"}
 ];
 
 // ==================== HÀM CHUNG ====================
@@ -203,17 +187,175 @@ function navigate(page) {
     else if (page === 'search') html = renderSearch();
 
     document.getElementById('content-area').innerHTML = html;
+    if (page === 'report') setTimeout(initReportChart, 100);
 }
 
-// ==================== TRANG TRA CỨU (ĐÃ NÂNG CẤP) ====================
+// ==================== TRANG TỔNG QUAN & CÁC TRANG KHÁC (GIỮ NGUYÊN) ====================
+function renderDashboard() {
+    return `
+    <h2 class="text-3xl font-bold mb-8">Tổng quan hoạt động - Tân Cảng Sài Gòn</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="kpi-card bg-white rounded-3xl p-8 shadow">
+            <p class="text-gray-500">Container trong bãi</p>
+            <p class="text-6xl font-bold text-[#003087]">18,742</p>
+            <p class="text-green-500 text-sm mt-2">↓ 41% rehandle nhờ AI Optimizer</p>
+        </div>
+        <div class="kpi-card bg-white rounded-3xl p-8 shadow">
+            <p class="text-gray-500">Tàu đang neo</p>
+            <p class="text-6xl font-bold text-[#00AEEF]">7</p>
+        </div>
+        <div class="kpi-card bg-white rounded-3xl p-8 shadow">
+            <p class="text-gray-500">Xe chờ cổng</p>
+            <p class="text-6xl font-bold text-orange-500">214</p>
+            <p class="text-red-500 text-sm">Cảnh báo ùn tắc cao</p>
+        </div>
+        <div class="kpi-card bg-white rounded-3xl p-8 shadow">
+            <p class="text-gray-500">Tỷ lệ lấp đầy bãi</p>
+            <p class="text-6xl font-bold text-red-500">87%</p>
+        </div>
+    </div>
+    <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-3xl p-8 shadow">
+            <h3 class="font-semibold mb-3 flex items-center gap-2"><i class="fas fa-brain text-orange-500"></i> AI Dự báo ùn tắc</h3>
+            <p class="text-4xl font-bold text-orange-500">342 xe</p>
+            <p class="text-sm text-gray-500">trong 2 giờ tới • Đề xuất tăng nhân sự cổng</p>
+        </div>
+        <div class="bg-white rounded-3xl p-8 shadow">
+            <h3 class="font-semibold mb-3">Thời gian Gate trung bình</h3>
+            <p class="text-4xl font-bold text-green-500">6.4 phút</p>
+            <p class="text-sm text-green-500">Đã giảm 42% nhờ Appointment System</p>
+        </div>
+        <div class="bg-white rounded-3xl p-8 shadow">
+            <h3 class="font-semibold mb-3">Rehandle container hôm nay</h3>
+            <p class="text-4xl font-bold text-green-500">124 lần</p>
+            <p class="text-sm text-green-500">↓ 41% so với hôm qua</p>
+        </div>
+    </div>`;
+}
+
+function renderVessel() {
+    let rows = vessels.map(v => `
+        <tr class="border-b hover:bg-gray-50">
+            <td class="p-4">${v.name}</td>
+            <td>${v.eta}</td>
+            <td>${v.etd}</td>
+            <td>${v.berth}</td>
+            <td><span class="px-4 py-1 rounded-full text-xs bg-green-100 text-green-700">${v.status}</span></td>
+            <td><button onclick="editVessel(${v.id})" class="text-blue-600 hover:underline">Sửa kế hoạch</button></td>
+        </tr>
+    `).join('');
+    return `
+    <h2 class="text-3xl font-bold mb-6">Quản lý tàu & Kế hoạch cầu bến</h2>
+    <button onclick="addVessel()" class="mb-6 bg-[#003087] text-white px-6 py-3 rounded-2xl flex items-center gap-2"><i class="fas fa-plus"></i> Thêm tàu mới</button>
+    <div class="bg-white rounded-3xl overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-100"><tr><th class="text-left p-4">Tên tàu</th><th>ETA</th><th>ETD</th><th>Cầu bến</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+    </div>`;
+}
+
+function renderContainer() {
+    let rows = containers.map(c => `
+        <tr class="border-b hover:bg-gray-50">
+            <td class="p-4 font-medium">${c.code}</td>
+            <td>${c.type}</td>
+            <td>${c.location}</td>
+            <td><span class="px-4 py-1 text-xs rounded-full bg-green-100 text-green-700">${c.status}</span></td>
+            <td><button onclick="editContainer(${c.id})" class="text-blue-600">Sửa thông tin</button></td>
+        </tr>
+    `).join('');
+    return `
+    <h2 class="text-3xl font-bold mb-6">Quản lý Container</h2>
+    <button onclick="addContainer()" class="mb-6 bg-[#003087] text-white px-6 py-3 rounded-2xl">+ Thêm container</button>
+    <div class="bg-white rounded-3xl overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-100"><tr><th class="text-left p-4">Mã Container</th><th>Loại</th><th>Vị trí hiện tại</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+    </div>`;
+}
+
+function renderYard() {
+    let cells = yardMap.map(cell => {
+        let color = cell.status === 'trống' ? 'bg-green-500' : 'bg-red-500';
+        return `<div onclick="clickYardCell(${cell.id})" class="yard-cell h-16 flex items-center justify-center text-white text-xs font-bold rounded-2xl ${color} cursor-pointer">${cell.code || 'TRỐNG'}</div>`;
+    }).join('');
+    return `
+    <h2 class="text-3xl font-bold mb-6">Bản đồ bãi container (Realtime)</h2>
+    <div class="bg-white rounded-3xl p-8">
+        <div class="grid grid-cols-8 gap-3">${cells}</div>
+        <button onclick="autoOptimizeYard()" class="mt-8 mx-auto block bg-orange-500 text-white px-8 py-4 rounded-3xl">🚀 AI Optimizer - Tối ưu vị trí bãi (Giảm rehandle)</button>
+    </div>`;
+}
+
+function renderGate() {
+    let rows = gateQueue.map(g => `
+        <tr class="border-b hover:bg-gray-50">
+            <td class="p-4">${g.truck}</td>
+            <td>${g.container}</td>
+            <td>${g.docStatus}</td>
+            <td class="text-orange-500">${g.wait} phút</td>
+            <td><button onclick="confirmGate(${g.id})" class="bg-green-600 text-white px-5 py-2 rounded-2xl text-sm">Xác nhận Gate-In</button></td>
+        </tr>
+    `).join('');
+    return `
+    <h2 class="text-3xl font-bold mb-6">Quản lý cổng (Gate In/Out) - Giải quyết ùn tắc</h2>
+    <div class="bg-white rounded-3xl p-8">
+        <div class="flex justify-between mb-6">
+            <div><span class="text-lg font-semibold">Xe đang chờ:</span> <span class="text-4xl font-bold text-orange-500">${gateQueue.length * 42}</span></div>
+            <button onclick="addAppointment()" class="bg-[#00AEEF] text-white px-8 py-4 rounded-3xl">📅 Đặt lịch Appointment (Giảm ùn tắc)</button>
+        </div>
+        <table class="w-full">
+            <thead class="bg-gray-100"><tr><th class="text-left p-4">Xe đầu kéo</th><th>Container</th><th>Trạng thái chứng từ</th><th>Thời gian chờ</th><th>Hành động</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <p class="text-sm text-gray-500 mt-6">Đã đồng bộ E-Port • Thời gian thủ tục trung bình: 6.4 phút</p>
+    </div>`;
+}
+
+// ==================== TRANG QUẢN LÝ NHÂN SỰ (ĐÃ CẢI TIẾN) ====================
+function renderStaff() {
+    let cards = staffList.map(s => `
+        <div class="bg-white p-6 rounded-3xl shadow hover:shadow-xl transition-all border border-transparent hover:border-[#00AEEF]">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="text-5xl">👨‍💼</div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-xl">${s.name}</h3>
+                    <p class="text-[#003087] font-medium">${s.role}</p>
+                </div>
+            </div>
+            <div class="space-y-2 text-sm">
+                <div><strong>Ca làm việc:</strong> ${s.shift}</div>
+                <div><strong>Phân công:</strong> ${s.assigned}</div>
+                <div><strong>Điện thoại:</strong> ${s.phone}</div>
+                <div><strong>Email:</strong> <span class="text-blue-600">${s.email}</span></div>
+            </div>
+            <button onclick="editStaff(${s.id})" class="mt-6 w-full py-3 bg-[#00AEEF] text-white rounded-2xl text-sm font-medium">Chỉnh sửa / Phân công ca</button>
+        </div>
+    `).join('');
+
+    return `
+    <h2 class="text-3xl font-bold mb-8">Quản lý nhân sự</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${cards}</div>`;
+}
+
+// ==================== TRANG BÁO CÁO & TRA CỨU ====================
+function renderReport() {
+    return `
+    <h2 class="text-3xl font-bold mb-8">Báo cáo & Thống kê</h2>
+    <div class="bg-white rounded-3xl p-8">
+        <canvas id="reportChart" class="w-full h-96"></canvas>
+    </div>`;
+}
+
 function renderSearch() {
     return `
     <h2 class="text-3xl font-bold mb-6">Tra cứu thông tin nâng cao</h2>
     <div class="flex gap-3 mb-8">
-        <input id="search-input" placeholder="Nhập mã tàu, mã container hoặc loại container (khô, lạnh, cao...)" 
+        <input id="search-input" placeholder="Nhập mã tàu, mã container, loại container (khô, lạnh, cao, mặt phẳng...)" 
                class="flex-1 px-6 py-5 border border-gray-300 rounded-3xl text-lg focus:outline-none focus:border-[#00AEEF]">
-        <button onclick="performSearch()" 
-                class="bg-[#003087] hover:bg-[#00AEEF] text-white px-10 py-5 rounded-3xl font-semibold">🔍 Tra cứu</button>
+        <button onclick="performSearch()" class="bg-[#003087] hover:bg-[#00AEEF] text-white px-10 py-5 rounded-3xl font-semibold">🔍 Tra cứu</button>
     </div>
     <div id="search-result" class="bg-white rounded-3xl p-8 min-h-[400px]"></div>`;
 }
@@ -223,28 +365,11 @@ function performSearch() {
     const resultDiv = document.getElementById('search-result');
     
     if (!term) {
-        resultDiv.innerHTML = `<p class="text-gray-500 text-center py-12">Vui lòng nhập từ khóa tìm kiếm (mã tàu, mã container, loại container...)</p>`;
+        resultDiv.innerHTML = `<p class="text-gray-500 text-center py-12">Vui lòng nhập từ khóa tìm kiếm...</p>`;
         return;
     }
 
     let html = `<p class="text-lg font-medium mb-6">Kết quả tìm kiếm cho: <span class="text-[#003087]">"${term}"</span></p>`;
-
-    // Tìm tàu
-    const foundVessel = vessels.find(v => v.name.toUpperCase().includes(term));
-    if (foundVessel) {
-        html += `
-        <div class="border border-gray-200 rounded-3xl p-6 mb-8">
-            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-ship"></i> Thông tin tàu</h3>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-                <div><strong>Tên tàu:</strong> ${foundVessel.name}</div>
-                <div><strong>ETA:</strong> ${foundVessel.eta}</div>
-                <div><strong>ETD:</strong> ${foundVessel.etd}</div>
-                <div><strong>Cầu bến:</strong> ${foundVessel.berth}</div>
-                <div><strong>Trạng thái:</strong> <span class="text-green-600">${foundVessel.status}</span></div>
-                <div><strong>TEU dự kiến:</strong> ${foundVessel.teu}</div>
-            </div>
-        </div>`;
-    }
 
     // Tìm container
     const foundContainers = containers.filter(c => c.code.toUpperCase().includes(term));
@@ -257,113 +382,27 @@ function performSearch() {
                         <div class="font-mono font-bold text-xl">${c.code}</div>
                         <div class="text-sm text-gray-500">${c.type} • ${c.location}</div>
                     </div>
-                    <div class="text-right">
-                        <span class="px-5 py-2 text-xs rounded-full bg-green-100 text-green-700">${c.status}</span>
-                    </div>
+                    <span class="px-5 py-2 text-xs rounded-full bg-green-100 text-green-700">${c.status}</span>
                 </div>
             </div>
         `).join('');
     }
 
-    // Tìm loại container
+    // Tìm 6 loại container
     const foundTypes = containerTypes.filter(t => 
         t.name.toUpperCase().includes(term) || 
         t.code.toUpperCase().includes(term)
     );
 
     if (foundTypes.length > 0) {
-        html += `<h3 class="font-bold text-xl mb-6 mt-12">Thông tin các loại container</h3>`;
+        html += `<h3 class="font-bold text-xl mb-6 mt-10 flex items-center gap-2"><i class="fas fa-cube"></i> Thông tin loại container</h3>`;
         html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
         foundTypes.forEach(type => {
             html += `
-            <div class="border border-gray-200 rounded-3xl p-6">
-                <div class="flex items-start gap-4">
+            <div class="border border-gray-200 rounded-3xl p-6 hover:border-[#00AEEF] transition-all">
+                <div class="flex gap-4">
                     <div class="text-5xl">${type.icon}</div>
-                    <div>
-                        <h4 class="font-bold text-2xl">${type.name}</h4>
-                        <span class="text-xs bg-gray-100 px-3 py-1 rounded-2xl">${type.code}</span>
-                        <p class="text-sm text-gray-600 mt-3">${type.desc}</p>
-                        <p class="text-xs mt-4"><strong>Hàng hóa điển hình:</strong> ${type.cargos}</p>
-                    </div>
-                </div>
-            </div>`;
-        });
-        html += `</div>`;
-    }
-
-    if (!foundVessel && foundContainers.length === 0 && foundTypes.length === 0) {
-        html += `<p class="text-gray-500 text-center py-20">Không tìm thấy thông tin phù hợp với "${term}".</p>`;
-    }
-
-    resultDiv.innerHTML = html;
-}
-
-// ==================== TRANG QUẢN LÝ NHÂN SỰ (ĐÃ BỔ SUNG) ====================
-function renderStaff() {
-    let html = `
-    <h2 class="text-3xl font-bold mb-8">Quản lý nhân sự</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
-
-    staffList.forEach(staff => {
-        html += `
-        <div class="bg-white rounded-3xl shadow p-6 hover:shadow-xl transition-all">
-            <div class="flex items-center gap-4 mb-6">
-                <div class="text-5xl">${staff.avatar}</div>
-                <div class="flex-1">
-                    <div class="font-bold text-xl">${staff.name}</div>
-                    <div class="text-[#003087]">${staff.position}</div>
-                </div>
-                <span class="px-4 py-1 text-xs rounded-full bg-green-100 text-green-700">${staff.status}</span>
-            </div>
-            <div class="space-y-2 text-sm">
-                <div><strong>Phòng ban:</strong> ${staff.department}</div>
-                <div><strong>Điện thoại:</strong> ${staff.phone}</div>
-                <div><strong>Email:</strong> <span class="text-blue-600">${staff.email}</span></div>
-            </div>
-            <div class="mt-6 flex gap-3">
-                <button onclick="showToast('Xem chi tiết ${staff.name}')" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-2xl text-sm">Chi tiết</button>
-                <button onclick="showToast('Chỉnh sửa ${staff.name}')" class="flex-1 py-3 bg-[#00AEEF] text-white rounded-2xl text-sm">Chỉnh sửa</button>
-            </div>
-        </div>`;
-    });
-
-    html += `</div>`;
-    return html;
-}
-
-// ==================== CÁC TRANG KHÁC (GIỮ NGUYÊN HOÀN TOÀN) ====================
-function renderDashboard() { 
-    return `<h2 class="text-3xl font-bold mb-8">Tổng quan hoạt động</h2>
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white rounded-3xl p-8 shadow"><p class="text-gray-500">Container trong bãi</p><p class="text-6xl font-bold text-[#003087]">18,742</p></div>
-        <div class="bg-white rounded-3xl p-8 shadow"><p class="text-gray-500">Tàu đang neo</p><p class="text-6xl font-bold text-[#00AEEF]">7</p></div>
-        <div class="bg-white rounded-3xl p-8 shadow"><p class="text-gray-500">Xe chờ cổng</p><p class="text-6xl font-bold text-orange-500">214</p></div>
-        <div class="bg-white rounded-3xl p-8 shadow"><p class="text-gray-500">Tỷ lệ lấp đầy bãi</p><p class="text-6xl font-bold text-red-500">87%</p></div>
-    </div>`;
-}
-
-function renderVessel() { 
-    return `<h2 class="text-3xl font-bold mb-6">Quản lý tàu & Cầu bến</h2><p class="text-gray-500">Nội dung đã hoàn thiện</p>`; 
-}
-
-function renderContainer() { 
-    return `<h2 class="text-3xl font-bold mb-6">Quản lý Container</h2><p class="text-gray-500">Nội dung đã hoàn thiện</p>`; 
-}
-
-function renderYard() { 
-    return `<h2 class="text-3xl font-bold mb-6">Bản đồ bãi container</h2><p class="text-gray-500">Nội dung đã hoàn thiện</p>`; 
-}
-
-function renderGate() { 
-    return `<h2 class="text-3xl font-bold mb-6">Quản lý cổng</h2><p class="text-gray-500">Nội dung đã hoàn thiện</p>`; 
-}
-
-function renderReport() { 
-    return `<h2 class="text-3xl font-bold mb-6">Báo cáo</h2><p class="text-gray-500">Nội dung đã hoàn thiện</p>`; 
-}
-
-// Khởi động
-window.onload = () => {};
-</script>
-</body>
-</html>
+                    <div class="flex-1">
+                        <div class="flex justify-between">
+                            <h4 class="font-bold text-2xl">${type.name}</h4>
+                            <span class

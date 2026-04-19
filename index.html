@@ -100,78 +100,54 @@ let gateQueue = [
     {id:1, truck:"51F-98765", container:"MSKU7839215", docStatus:"Hoàn tất E-Port", wait:8}
 ];
 
-// Dữ liệu 6 loại container (đã có từ trước)
+// Dữ liệu 6 loại container
 let containerTypes = [
-    { name: "Container khô", code: "DV / GP", icon: "📦", desc: "Container khô (Dry Container / General Purpose)...", sizes: "20ft, 40ft, 40HC", cargos: "Hàng điện tử, quần áo, giày dép, thực phẩm đóng gói khô, máy móc nhỏ, vật liệu xây dựng, đồ gia dụng" },
-    { name: "Container cao", code: "HC (High Cube)", icon: "📦⬆️", desc: "Container cao (High Cube Container)...", sizes: "40HC", cargos: "Đồ nội thất, quần áo may mặc, bông sợi, hàng hóa cồng kềnh nhẹ, giấy cuộn, hàng dệt may" },
-    { name: "Container lạnh", code: "Reefer", icon: "❄️", desc: "Container lạnh (Reefer Container)...", sizes: "20ft, 40ft, 40HC", cargos: "Thủy hải sản đông lạnh, trái cây tươi, rau củ quả, thịt tươi đông lạnh, dược phẩm, sữa tươi, hoa tươi" },
-    { name: "Container mặt phẳng", code: "FR (Flat Rack)", icon: "🛠️", desc: "Container mặt phẳng (Flat Rack Container)...", sizes: "20ft, 40ft", cargos: "Máy móc công nghiệp lớn, xe ô tô, xe máy, ống thép, gỗ tròn, thiết bị nặng, turbine gió" },
-    { name: "Container hở mái", code: "OT (Open Top)", icon: "🔝", desc: "Container hở mái (Open Top Container)...", sizes: "20ft, 40ft", cargos: "Máy móc nặng, ống thép dài, gỗ xẻ, hàng hóa quá cao không lọt qua cửa, thiết bị xây dựng" },
-    { name: "Container bồn", code: "Tank", icon: "🛢️", desc: "Container bồn (Tank Container)...", sizes: "20ft, 40ft", cargos: "Xăng dầu, hóa chất lỏng, rượu vang, nước sốt, khí hóa lỏng, thực phẩm lỏng, axit, dung môi" }
+    {
+        name: "Container khô", code: "DV / GP", icon: "📦",
+        desc: "Container khô (Dry Container / General Purpose) là loại container phổ biến nhất, được thiết kế cho hàng hóa thông thường không yêu cầu kiểm soát nhiệt độ.",
+        sizes: "20ft, 40ft, 40HC",
+        cargos: "Hàng điện tử, quần áo, giày dép, thực phẩm đóng gói khô, máy móc nhỏ, vật liệu xây dựng, đồ gia dụng"
+    },
+    {
+        name: "Container cao", code: "HC (High Cube)", icon: "📦⬆️",
+        desc: "Container cao (High Cube Container) có chiều cao lớn hơn khoảng 30cm, phù hợp cho hàng hóa nhẹ nhưng chiếm nhiều thể tích.",
+        sizes: "40HC",
+        cargos: "Đồ nội thất, quần áo may mặc, bông sợi, hàng hóa cồng kềnh nhẹ, giấy cuộn, hàng dệt may"
+    },
+    {
+        name: "Container lạnh", code: "Reefer", icon: "❄️",
+        desc: "Container lạnh (Reefer Container) được trang bị máy lạnh để duy trì nhiệt độ ổn định cho hàng hóa dễ hỏng.",
+        sizes: "20ft, 40ft, 40HC",
+        cargos: "Thủy hải sản đông lạnh, trái cây tươi, rau củ quả, thịt tươi đông lạnh, dược phẩm, sữa tươi, hoa tươi"
+    },
+    {
+        name: "Container mặt phẳng", code: "FR (Flat Rack)", icon: "🛠️",
+        desc: "Container mặt phẳng không có vách bên và mái, cho phép bốc dỡ hàng quá khổ.",
+        sizes: "20ft, 40ft",
+        cargos: "Máy móc công nghiệp lớn, xe ô tô, xe máy, ống thép, gỗ tròn, thiết bị nặng"
+    },
+    {
+        name: "Container hở mái", code: "OT (Open Top)", icon: "🔝",
+        desc: "Container hở mái có mái có thể tháo rời, cho phép bốc dỡ hàng từ trên xuống bằng cần cẩu.",
+        sizes: "20ft, 40ft",
+        cargos: "Máy móc nặng, ống thép dài, gỗ xẻ, hàng hóa quá cao, thiết bị xây dựng"
+    },
+    {
+        name: "Container bồn", code: "Tank", icon: "🛢️",
+        desc: "Container bồn chuyên dụng để vận chuyển chất lỏng, khí nén hoặc hàng hóa nguy hiểm.",
+        sizes: "20ft, 40ft",
+        cargos: "Xăng dầu, hóa chất lỏng, rượu vang, nước sốt, khí hóa lỏng, thực phẩm lỏng"
+    }
 ];
 
-// ==================== DỮ LIỆU MỚI: QUẢN LÝ NHÂN SỰ ====================
+// ==================== DỮ LIỆU NHÂN SỰ (MỚI BỔ SUNG) ====================
 let staffList = [
-    {
-        id: 1,
-        name: "Kha Đức Duy",
-        position: "Trưởng ca khai thác",
-        department: "Khai thác cảng",
-        phone: "0912 345 678",
-        email: "duy.kha@tanhcang.com",
-        status: "Đang làm việc",
-        avatar: "👨‍💼"
-    },
-    {
-        id: 2,
-        name: "Trần Kim Dung",
-        position: "Nhân viên lập kế hoạch",
-        department: "Kế hoạch & Điều độ",
-        phone: "0987 654 321",
-        email: "dung.tran@tanhcang.com",
-        status: "Đang làm việc",
-        avatar: "👩‍💼"
-    },
-    {
-        id: 3,
-        name: "Nguyễn Tiến Dũng",
-        position: "Giám sát bãi container",
-        department: "Vận hành bãi",
-        phone: "0934 567 890",
-        email: "dung.nguyen@tanhcang.com",
-        status: "Đang làm việc",
-        avatar: "👨‍🔧"
-    },
-    {
-        id: 4,
-        name: "Lê Hoàng Anh Đức",
-        position: "Điều phối tàu",
-        department: "Khai thác tàu",
-        phone: "0901 234 567",
-        email: "duc.le@tanhcang.com",
-        status: "Đang làm việc",
-        avatar: "👨‍✈️"
-    },
-    {
-        id: 5,
-        name: "Nguyễn Cao Minh Đức",
-        position: "Nhân viên kỹ thuật",
-        department: "Kỹ thuật thiết bị",
-        phone: "0978 123 456",
-        email: "minhduc.nguyen@tanhcang.com",
-        status: "Đang làm việc",
-        avatar: "🛠️"
-    },
-    {
-        id: 6,
-        name: "Nguyễn Phạm Thiên Hào",
-        position: "Nhân viên cổng",
-        department: "Quản lý cổng",
-        phone: "0965 432 109",
-        email: "hao.nguyen@tanhcang.com",
-        status: "Đang làm việc",
-        avatar: "🚛"
-    }
+    { id: 1, name: "Kha Đức Duy", position: "Trưởng ca khai thác", department: "Khai thác cảng", phone: "0912 345 678", email: "duy.kha@tanhcang.com", status: "Đang làm việc", avatar: "👨‍💼" },
+    { id: 2, name: "Trần Kim Dung", position: "Nhân viên lập kế hoạch", department: "Kế hoạch & Điều độ", phone: "0987 654 321", email: "dung.tran@tanhcang.com", status: "Đang làm việc", avatar: "👩‍💼" },
+    { id: 3, name: "Nguyễn Tiến Dũng", position: "Giám sát bãi container", department: "Vận hành bãi", phone: "0934 567 890", email: "dung.nguyen@tanhcang.com", status: "Đang làm việc", avatar: "👨‍🔧" },
+    { id: 4, name: "Lê Hoàng Anh Đức", position: "Điều phối tàu", department: "Khai thác tàu", phone: "0901 234 567", email: "duc.le@tanhcang.com", status: "Đang làm việc", avatar: "👨‍✈️" },
+    { id: 5, name: "Nguyễn Cao Minh Đức", position: "Nhân viên kỹ thuật", department: "Kỹ thuật thiết bị", phone: "0978 123 456", email: "minhduc.nguyen@tanhcang.com", status: "Đang làm việc", avatar: "🛠️" },
+    { id: 6, name: "Nguyễn Phạm Thiên Hào", position: "Nhân viên cổng", department: "Quản lý cổng", phone: "0965 432 109", email: "hao.nguyen@tanhcang.com", status: "Đang làm việc", avatar: "🚛" }
 ];
 
 // ==================== HÀM CHUNG ====================
@@ -229,12 +205,12 @@ function navigate(page) {
     document.getElementById('content-area').innerHTML = html;
 }
 
-// ==================== TRANG TRA CỨU (giữ nguyên từ trước) ====================
+// ==================== TRANG TRA CỨU (ĐÃ NÂNG CẤP) ====================
 function renderSearch() {
     return `
     <h2 class="text-3xl font-bold mb-6">Tra cứu thông tin nâng cao</h2>
     <div class="flex gap-3 mb-8">
-        <input id="search-input" placeholder="Nhập mã tàu, mã container, loại container (khô, lạnh, cao...) hoặc từ khóa..." 
+        <input id="search-input" placeholder="Nhập mã tàu, mã container hoặc loại container (khô, lạnh, cao...)" 
                class="flex-1 px-6 py-5 border border-gray-300 rounded-3xl text-lg focus:outline-none focus:border-[#00AEEF]">
         <button onclick="performSearch()" 
                 class="bg-[#003087] hover:bg-[#00AEEF] text-white px-10 py-5 rounded-3xl font-semibold">🔍 Tra cứu</button>
@@ -247,7 +223,7 @@ function performSearch() {
     const resultDiv = document.getElementById('search-result');
     
     if (!term) {
-        resultDiv.innerHTML = `<p class="text-gray-500 text-center py-12">Vui lòng nhập từ khóa tìm kiếm...</p>`;
+        resultDiv.innerHTML = `<p class="text-gray-500 text-center py-12">Vui lòng nhập từ khóa tìm kiếm (mã tàu, mã container, loại container...)</p>`;
         return;
     }
 
@@ -256,21 +232,67 @@ function performSearch() {
     // Tìm tàu
     const foundVessel = vessels.find(v => v.name.toUpperCase().includes(term));
     if (foundVessel) {
-        html += `... (giữ nguyên phần tìm tàu như code cũ) ...`;
+        html += `
+        <div class="border border-gray-200 rounded-3xl p-6 mb-8">
+            <h3 class="font-bold text-xl mb-4 flex items-center gap-2"><i class="fas fa-ship"></i> Thông tin tàu</h3>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div><strong>Tên tàu:</strong> ${foundVessel.name}</div>
+                <div><strong>ETA:</strong> ${foundVessel.eta}</div>
+                <div><strong>ETD:</strong> ${foundVessel.etd}</div>
+                <div><strong>Cầu bến:</strong> ${foundVessel.berth}</div>
+                <div><strong>Trạng thái:</strong> <span class="text-green-600">${foundVessel.status}</span></div>
+                <div><strong>TEU dự kiến:</strong> ${foundVessel.teu}</div>
+            </div>
+        </div>`;
     }
 
     // Tìm container
     const foundContainers = containers.filter(c => c.code.toUpperCase().includes(term));
     if (foundContainers.length > 0) {
-        html += `... (giữ nguyên phần tìm container) ...`;
+        html += `<h3 class="font-bold text-lg mb-4">Container tìm thấy (${foundContainers.length})</h3>`;
+        html += foundContainers.map(c => `
+            <div class="bg-gray-50 border border-gray-200 rounded-3xl p-6 mb-4">
+                <div class="flex justify-between">
+                    <div>
+                        <div class="font-mono font-bold text-xl">${c.code}</div>
+                        <div class="text-sm text-gray-500">${c.type} • ${c.location}</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="px-5 py-2 text-xs rounded-full bg-green-100 text-green-700">${c.status}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
     }
 
     // Tìm loại container
     const foundTypes = containerTypes.filter(t => 
-        t.name.toUpperCase().includes(term) || t.code.toUpperCase().includes(term)
+        t.name.toUpperCase().includes(term) || 
+        t.code.toUpperCase().includes(term)
     );
-    if (foundTypes.length > 0 || term.includes('CONTAINER')) {
-        // ... (giữ nguyên phần hiển thị 6 loại container)
+
+    if (foundTypes.length > 0) {
+        html += `<h3 class="font-bold text-xl mb-6 mt-12">Thông tin các loại container</h3>`;
+        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">`;
+        foundTypes.forEach(type => {
+            html += `
+            <div class="border border-gray-200 rounded-3xl p-6">
+                <div class="flex items-start gap-4">
+                    <div class="text-5xl">${type.icon}</div>
+                    <div>
+                        <h4 class="font-bold text-2xl">${type.name}</h4>
+                        <span class="text-xs bg-gray-100 px-3 py-1 rounded-2xl">${type.code}</span>
+                        <p class="text-sm text-gray-600 mt-3">${type.desc}</p>
+                        <p class="text-xs mt-4"><strong>Hàng hóa điển hình:</strong> ${type.cargos}</p>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += `</div>`;
+    }
+
+    if (!foundVessel && foundContainers.length === 0 && foundTypes.length === 0) {
+        html += `<p class="text-gray-500 text-center py-20">Không tìm thấy thông tin phù hợp với "${term}".</p>`;
     }
 
     resultDiv.innerHTML = html;
@@ -279,48 +301,28 @@ function performSearch() {
 // ==================== TRANG QUẢN LÝ NHÂN SỰ (ĐÃ BỔ SUNG) ====================
 function renderStaff() {
     let html = `
-    <div class="flex justify-between items-center mb-8">
-        <h2 class="text-3xl font-bold">Quản lý nhân sự</h2>
-        <button onclick="showToast('Chức năng thêm nhân viên đang được phát triển')" 
-                class="bg-[#003087] text-white px-6 py-3 rounded-3xl flex items-center gap-2">
-            <i class="fas fa-plus"></i> Thêm nhân viên
-        </button>
-    </div>
-
+    <h2 class="text-3xl font-bold mb-8">Quản lý nhân sự</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
 
     staffList.forEach(staff => {
         html += `
-        <div class="bg-white rounded-3xl shadow p-6 hover:shadow-xl transition-all border border-transparent hover:border-[#00AEEF]">
+        <div class="bg-white rounded-3xl shadow p-6 hover:shadow-xl transition-all">
             <div class="flex items-center gap-4 mb-6">
                 <div class="text-5xl">${staff.avatar}</div>
                 <div class="flex-1">
                     <div class="font-bold text-xl">${staff.name}</div>
-                    <div class="text-[#003087] font-medium">${staff.position}</div>
+                    <div class="text-[#003087]">${staff.position}</div>
                 </div>
-                <span class="px-4 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">${staff.status}</span>
+                <span class="px-4 py-1 text-xs rounded-full bg-green-100 text-green-700">${staff.status}</span>
             </div>
-            
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Phòng ban:</span>
-                    <span class="font-medium">${staff.department}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Số điện thoại:</span>
-                    <span class="font-medium">${staff.phone}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500">Email:</span>
-                    <span class="font-medium text-blue-600">${staff.email}</span>
-                </div>
+            <div class="space-y-2 text-sm">
+                <div><strong>Phòng ban:</strong> ${staff.department}</div>
+                <div><strong>Điện thoại:</strong> ${staff.phone}</div>
+                <div><strong>Email:</strong> <span class="text-blue-600">${staff.email}</span></div>
             </div>
-
             <div class="mt-6 flex gap-3">
-                <button onclick="showToast('Đang xem chi tiết ${staff.name}')" 
-                        class="flex-1 bg-gray-100 hover:bg-gray-200 py-3 rounded-2xl text-sm font-medium">Chi tiết</button>
-                <button onclick="showToast('Đang chỉnh sửa thông tin ${staff.name}')" 
-                        class="flex-1 bg-[#00AEEF] text-white py-3 rounded-2xl text-sm font-medium">Chỉnh sửa</button>
+                <button onclick="showToast('Xem chi tiết ${staff.name}')" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-2xl text-sm">Chi tiết</button>
+                <button onclick="showToast('Chỉnh sửa ${staff.name}')" class="flex-1 py-3 bg-[#00AEEF] text-white rounded-2xl text-sm">Chỉnh sửa</button>
             </div>
         </div>`;
     });
@@ -329,7 +331,7 @@ function renderStaff() {
     return html;
 }
 
-// ==================== CÁC TRANG KHÁC (GIỮ NGUYÊN) ====================
+// ==================== CÁC TRANG KHÁC (GIỮ NGUYÊN HOÀN TOÀN) ====================
 function renderDashboard() { 
     return `<h2 class="text-3xl font-bold mb-8">Tổng quan hoạt động</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -341,7 +343,7 @@ function renderDashboard() {
 }
 
 function renderVessel() { 
-    return `<h2 class="text-3xl font-bold mb-6">Quản lý tàu & Cầu bến</h2><p class="text-gray-500">Nội dung đã hoàn thiện</p>`;
+    return `<h2 class="text-3xl font-bold mb-6">Quản lý tàu & Cầu bến</h2><p class="text-gray-500">Nội dung đã hoàn thiện</p>`; 
 }
 
 function renderContainer() { 
